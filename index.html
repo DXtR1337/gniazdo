@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokoje Pustego Gniazda v20.0 (Updated Links & Reflection Style)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* === Zmienne CSS === */
+        :root {
+            --font-primary: 'Lato', sans-serif;
+            --color-text: #3b4151; --color-text-light: #6b7280;
+            --color-bg: #f9fafb; --color-header-bg: #4b5a6a; --color-header-text: #f5f7fa;
+            --color-accent: #60a5fa; --color-accent-hover: #3b82f6;
+            --color-nav-button: #8b9cb0; --color-nav-button-hover: #718096;
+            --color-modal-bg: #ffffff; --color-modal-overlay: rgba(40, 50, 60, 0.6);
+            --color-interactive-bg: #ffffff; --color-interactive-border: #e5e7eb; --color-interactive-hover-border: #a0b1c2;
+            --color-selected-bg: #e0f2fe; --color-selected-border: #3b82f6; /* Akcentowy niebieski dla zaznaczenia */
+            --color-custom-item-bg: #ffffff; --color-textarea-bg: #f8fafc;
+            --color-save-button-bg: #9ca3af; --color-save-button-hover: #6b7280; --color-save-button-saved-bg: #86efac; --color-save-button-saved-text: #166534;
+            --color-save-room-bg: #1e90ff; /* DodgerBlue */
+            --color-save-room-hover: #1c86ee; /* Darker DodgerBlue */
+            --color-delete-room-bg: #ef4444; /* Red */
+            --color-delete-room-hover: #dc2626; /* Darker Red */
+            --shadow-light: 0 2px 4px rgba(0,0,0,0.06); --shadow-medium: 0 4px 10px rgba(0,0,0,0.1); --shadow-large: 0 10px 25px rgba(0,0,0,0.15);
+            --border-radius: 10px; --transition-speed: 0.25s;
+            --bg-hub: linear-gradient(180deg, #f9fafb 0%, #eef2f5 100%);
+            --bg-past: linear-gradient(180deg, #fffbf0 0%, #fef3d9 100%);
+            --bg-present: linear-gradient(180deg, #f0f7fa 0%, #e6eff4 100%);
+            --bg-future: linear-gradient(180deg, #f0fdf4 0%, #e0f2e3 100%);
+            --bg-rebuilt: linear-gradient(180deg, #f8f8f8 0%, #efefef 100%);
+            --bg-creator: linear-gradient(180deg, #f3f4ff 0%, #e9eaff 100%);
+            --bg-custom-view: linear-gradient(180deg, #fffbeb 0%, #fff7d0 100%);
+            --bg-quiz: linear-gradient(180deg, #e8f5e9 0%, #dcedc8 100%);
+            --bg-definition: linear-gradient(180deg, #e0f7fa 0%, #c5e1a5 100%); /* Light blue to light green */
+            --bg-about: linear-gradient(180deg, #e3f2fd 0%, #bbdefb 100%); /* Light blue gradient */
+             --bg-exercise: linear-gradient(180deg, #fff9c4 0%, #fff176 100%); /* Light yellow gradient for exercise */
+             --bg-links: linear-gradient(180deg, #e1bee7 0%, #ce93d8 100%); /* Light purple for links */
+             --color-export-bg: #4CAF50; /* Green */
+             --color-export-hover: #45a049; /* Darker green */
+             --color-import-bg: #ff9800; /* Orange */
+             --color-import-hover: #f57c00; /* Darker orange */
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:var(--font-primary);background-color:var(--color-bg);color:var(--color-text);line-height:1.7;display:flex;flex-direction:column;min-height:100vh; font-size: 16px;}
+        main{flex-grow:1;position:relative;overflow:hidden}
+        button{font-family:inherit;font-size:inherit;cursor:pointer;border:none;padding:.8em 1.6em;border-radius:var(--border-radius);background-color:var(--color-accent);color:#fff;transition:all var(--transition-speed) ease;box-shadow:var(--shadow-light);-webkit-appearance:none;-moz-appearance:none;appearance:none;line-height:inherit}
+        button:hover{background-color:var(--color-accent-hover);transform:translateY(-2px);box-shadow:var(--shadow-medium)}
+        button:active{transform:translateY(0);box-shadow:var(--shadow-light);filter:brightness(.95)}
+        button:disabled{background-color:#d1d5db;color:#9ca3af;cursor:not-allowed;transform:none;box-shadow:none}
+        header,footer{background-color:var(--color-header-bg);color:var(--color-header-text);padding:1rem 1.5rem;text-align:center;flex-shrink:0;box-shadow:var(--shadow-medium)}
+        footer{font-size:.85rem;color:#d1d5db;padding:.8rem 1.5rem}
+        .room{position:absolute;top:0;left:0;width:100%;height:100%;padding:40px 20px;opacity:0;visibility:hidden;transition:opacity var(--transition-speed) ease-in-out,visibility 0s linear var(--transition-speed);overflow-y:auto}
+        .room.is-active{opacity:1;visibility:visible;transition-delay:0s;z-index:1}
+        .room h2{margin-bottom:25px;font-weight:400;font-size:2.2rem;color:var(--color-text-light);text-align:center;width:100%;max-width:800px;margin-left:auto;margin-right:auto}
+        .room p{max-width:700px;margin-bottom:40px;text-align:center;color:var(--color-text-light);font-size:1.15rem}
+        .room-content{width:100%;max-width:1100px;margin:0 auto;padding:0 15px;display:flex;flex-direction:column;align-items:center;min-height:calc(100% - 80px)}
+        #hub{background:var(--bg-hub)} #room-past{background:var(--bg-past)} #room-present{background:var(--bg-present)} #room-future{background:var(--bg-future)} #room-rebuilt{background:var(--bg-rebuilt)} #room-custom-creator{background:var(--bg-creator)} #room-custom-view{background:var(--bg-custom-view)} #room-quiz{background:var(--bg-quiz);} #room-definition{background:var(--bg-definition);} #room-about{background:var(--bg-about);} #room-exercise{background:var(--bg-exercise);} #room-links{background:var(--bg-links);}
+
+
+        #hub .navigation{display:flex;flex-wrap:wrap;justify-content:center;gap:20px;margin-bottom:40px; flex-direction: column; align-items: center;} /* Align buttons centrally in groups */
+         #hub .nav-group {
+             display: flex;
+             flex-wrap: wrap;
+             justify-content: center;
+             gap: 20px;
+             margin-bottom: 30px; /* Space between groups */
+             padding-bottom: 20px; /* Space below group, above optional border */
+             border-bottom: 1px dashed #d1d5db; /* Optional separator line */
+             width: 100%; /* Take full width */
+             max-width: 800px; /* Limit group width */
+         }
+         #hub .nav-group:last-child {
+             border-bottom: none; /* No border after the last group */
+             margin-bottom: 0;
+             padding-bottom: 0;
+         }
+         #hub .nav-group h3 {
+              width: 100%; /* Heading takes full width */
+              text-align: center;
+              margin-bottom: 15px;
+              color: var(--color-text); /* Darker text for heading */
+              font-size: 1.3rem;
+              font-weight: 700;
+         }
+
+
+        /* Hub Navigation Button Hover Effect */
+        #hub .navigation button{
+            background-color:var(--color-nav-button);
+            display:flex;align-items:center;gap:12px;min-width:280px;justify-content:center;font-size:1.05rem;padding:1em 1.8em;
+            /* Added subtle border on hover */
+            border: 1px solid transparent;
+        }
+        #hub .navigation button:hover{
+            background-color:var(--color-nav-button-hover);
+            /* Subtle border on hover */
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        #hub .navigation span{font-size:1.6em;line-height:1} #hub-visual{margin-top:30px;font-size:3em;transition:transform .5s ease}
+
+        /* Navigation Icons */
+        .obj-past::before{content:'🕰️'} .obj-present::before{content:'⏳'} .obj-future::before{content:'🚀'} .obj-rebuilt::before{content:'🏠'} .obj-custom-creator::before{content:'🛠️'} .quiz-icon::before { content: '❓'; } .saved-room-icon::before { content: '💾'; } .definition-icon::before { content: '📜'; } .about-icon::before { content: 'ℹ️'; } .exercise-icon::before { content: '💡'; } .links-icon::before { content: '🔗'; }
+
+
+        /* Interactive Items (Objects) */
+        .objects-container{display:flex;flex-wrap:wrap;justify-content:center;gap:30px;margin:40px 0;width:100%}
+        .interactive-item{background-color:var(--color-interactive-bg);border:1px solid var(--color-interactive-border);border-radius:var(--border-radius);padding:25px 20px;text-align:center;min-width:150px;max-width:190px;cursor:pointer;transition:transform var(--transition-speed) ease,box-shadow var(--transition-speed) ease,border-color var(--transition-speed) ease, background-color var(--transition-speed) ease; box-shadow:var(--shadow-light);display:flex;flex-direction:column;align-items:center;gap:12px;color:var(--color-text)}
+        .interactive-item:hover{transform:translateY(-5px);box-shadow:var(--shadow-medium);border-color:var(--color-interactive-hover-border)}
+        /* Make span text slightly bolder */
+        .interactive-item span{font-size:1rem;color:#4b5563; font-weight: 600;} /* Added font-weight */
+        /* Default Interactive Item Icon (used in specific rooms) */
+        .interactive-item:not(.obj-symbol-passion):not(.obj-symbol-relation):not(.obj-symbol-goal):not(.obj-symbol-memory):not(.obj-symbol-nature):not(.obj-symbol-travel):not(.obj-symbol-learning):not(.obj-symbol-selfcare)::before {
+             font-size:2.8em;display:block;color:#6b7280;margin-bottom:8px;
+        }
+
+        /* Specific Interactive Item Icons (used in specific rooms) */
+        .obj-frame::before{content:'🖼️'} .obj-toy::before{content:'🧸'} .obj-drawing::before{content:'🎨'} .obj-growth::before{content:'📏'} .obj-bike::before{content:'🚲'}
+        .obj-empty-room::before{content:'🚪'} .obj-table::before{content:'🍽️'} .obj-remote::before{content:'🛋️'} .obj-phone::before{content:'📱'}
+        .obj-suitcase::before{content:'🗺️'} .obj-tools::before{content:'🔧'} .obj-books::before{content:'📚'} .obj-mirror::before{content:'🪞'}
+        .obj-calendar::before{content:'🗓️'} .obj-new-photos::before{content:'📸'} .obj-project::before{content:'🧶'} .obj-armchair::before{content:'🛋️'}
+
+        /* Symbol Icons (used in Creator and Custom View) */
+        .obj-symbol-passion::before{content:'🎨'} .obj-symbol-relation::before{content:'❤️'} .obj-symbol-goal::before{content:'🎯'} .obj-symbol-memory::before{content:'📸'} .obj-symbol-nature::before{content:'🌳'} .obj-symbol-travel::before{content:'✈️'} .obj-symbol-learning::before{content:'💡'} .obj-symbol-selfcare::before{content:'🧘'}
+
+        #symbol-gallery .interactive-item{border-width:2px; background-color:#f9fafb;}
+        /* === Poprawione Podświetlanie bez !important === */
+         #symbol-gallery button.interactive-item.selected {
+            border-color: var(--color-selected-border);
+            background-color: var(--color-selected-bg);
+            transform: scale(1.05); /* Utrzymaj transform z hover */
+            box-shadow: var(--shadow-medium);
+        }
+        #creator-actions{margin-top:30px;text-align:center} #selection-info{font-size:.9em;margin-top:15px;color:var(--color-text-light)}
+        #create-custom-room-btn{background-color:#4caf50} #create-custom-room-btn:hover{background-color:#45a049} #create-custom-room-btn:disabled{background-color:#c8e6c9}
+        #custom-room-items{gap:35px}
+        .custom-item{background-color:var(--color-custom-item-bg);border-radius:var(--border-radius);padding:25px;box-shadow:var(--shadow-medium);text-align:center;display:flex;flex-direction:column;align-items:center;gap:18px;min-width:220px;width:100%;max-width:320px}
+        .custom-item::before{font-size:3.5em;color:#555; display: block; margin-bottom: 8px;} /* Added display/margin for consistency */
+        .custom-item span{font-weight:700;color:#444;font-size:1.1rem}
+        .custom-item textarea{width:100%;min-height:110px;border:1px solid #d1d5db;border-radius:5px;padding:12px;font-family:inherit;font-size:1rem;resize:vertical;background-color:var(--color-textarea-bg)}
+        .custom-item textarea:focus{outline:2px solid var(--color-accent);border-color:var(--color-accent)}
+        .custom-item .save-reflection{margin-top:10px;padding:7px 14px;font-size:.85em;background-color:var(--color-save-button-bg);color:#37474f}
+        .custom-item .save-reflection:hover{background-color:var(--color-save-button-hover)} .custom-item .save-reflection.saved{background-color:var(--color-save-button-saved-bg);color:var(--color-save-button-saved-text);cursor:default}
+
+        /* Custom Room View Buttons */
+        .custom-view-actions {
+            margin-top: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            width: 100%; /* Ensure container uses full width */
+        }
+         .custom-view-actions .button { /* Use a class for flex items */
+             flex-grow: 1; /* Allow buttons to grow */
+             max-width: 250px; /* Max width for flex items */
+         }
+
+        #save-custom-room-btn {
+             background-color: var(--color-save-room-bg);
+        }
+        #save-custom-room-btn:hover {
+             background-color: var(--color-save-room-hover);
+        }
+        #delete-custom-room-btn { /* New Delete Button */
+             background-color: var(--color-delete-room-bg);
+             color: #fff;
+        }
+        #delete-custom-room-btn:hover {
+            background-color: var(--color-delete-room-hover);
+        }
+
+
+        /* --- Quiz Styles --- */
+        #room-quiz .room-content > p:first-of-type { /* Intro paragraph */
+            margin-bottom: 30px;
+            color: var(--color-text);
+        }
+        #quiz-container {
+            background-color: var(--color-modal-bg); /* Reuse modal background */
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow-medium);
+            width: 100%;
+            max-width: 700px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 30px; /* Space before back button */
+        }
+        #question-area {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        #quiz-question-text {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--color-text);
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        #quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+        #quiz-options label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            color: var(--color-text);
+            cursor: pointer;
+            padding: 12px 15px;
+            border: 1px solid var(--color-interactive-border);
+            border-radius: var(--border-radius);
+            transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+        }
+        #quiz-options label:hover {
+            background-color: #f0f4f8;
+            border-color: var(--color-interactive-hover-border);
+        }
+        #quiz-options input[type="radio"] {
+            /* Hide default radio button and style with pseudo-elements */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--color-interactive-border);
+            border-radius: 50%;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+        #quiz-options input[type="radio"]::before {
+             content: '';
+             position: absolute;
+             top: 50%;
+             left: 50%;
+             transform: translate(-50%, -50%);
+             width: 10px;
+             height: 10px;
+             border-radius: 50%;
+             background-color: var(--color-accent);
+             opacity: 0;
+             transition: opacity var(--transition-speed) ease;
+        }
+         #quiz-options input[type="radio"]:checked {
+             border-color: var(--color-accent);
+         }
+        #quiz-options input[type="radio"]:checked::before {
+             opacity: 1;
+        }
+        #quiz-result-area {
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        #quiz-score { /* Summary header style */
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-text);
+            margin-bottom: 10px;
+        }
+        #quiz-feedback {
+             width: 100%; /* Ensure it takes full width to control paragraph alignment */
+             font-size: 1.1rem;
+             color: var(--color-text-light);
+             text-align: left; /* Feedback paragraphs left-aligned */
+             margin-bottom: 20px; /* Space before button */
+             padding: 0 15px; /* Added padding to avoid text touching scrollbar */
+        }
+        /* Style for paragraphs within feedback - INCREASED MARGIN and BORDER */
+        #quiz-feedback p {
+             margin: 15px 0; /* Margin above and below each paragraph */
+             padding-bottom: 15px; /* Space above border */
+             border-bottom: 1px dashed #d1d5db; /* Dashed border for separation */
+        }
+        #quiz-feedback p:first-child {
+             margin-top: 0; /* No top margin on the first paragraph */
+             padding-top: 0; /* No top padding on the first paragraph */
+        }
+        #quiz-feedback p:last-child {
+             margin-bottom: 0; /* No margin after the last paragraph */
+             padding-bottom: 0; /* No bottom padding on the last paragraph */
+             border-bottom: none; /* No border after the last paragraph */
+        }
+
+
+        #retake-quiz-btn {
+            margin-top: 10px;
+            background-color: #607d8b; /* Grayish blue */
+        }
+        #retake-quiz-btn:hover {
+             background-color: #455a64;
+        }
+        #next-question-btn {
+            align-self: flex-end; /* Align button to the right */
+            width: auto; /* Prevent button from stretching */
+        }
+
+
+        /* --- Modal Styles --- */
+        #infoDialog{
+            width:90%;max-width:550px;border:none;border-radius:15px;padding:2.5em 3em;box-shadow:var(--shadow-large);text-align:center;background-color:var(--color-modal-bg);z-index:100;
+            position: fixed; /* Change from absolute to fixed */
+            top: 50%; /* Position 50% from top */
+            left: 50%; /* Position 50% from left */
+            transform: translate(-50%, -50%); /* Pull back by half its size to center */
+            margin: 0; /* Remove default margin */
+            /* Optional: Add max-height and overflow if content can be tall */
+            max-height: 90vh;
+            overflow-y: auto;
+            display: block; /* Ensure dialog is block */
+            visibility: hidden; /* Hidden by default */
+            opacity: 0;
+            transition: opacity var(--transition-speed) ease-in-out, visibility 0s linear var(--transition-speed);
+        }
+         #infoDialog[open] {
+             visibility: visible;
+             opacity: 1;
+             transition-delay: 0s;
+         }
+
+        #infoDialog::backdrop{background-color:var(--color-modal-overlay);backdrop-filter:blur(5px); z-index: 99;} /* Ensure backdrop is below dialog */
+        #infoDialog p{margin:0 0 1.2em;font-size:1.1rem;color:var(--color-text);line-height:1.6}
+        /* Style for the main reflection text in the modal when it's clickable */
+        #infoDialog small.is-clickable{
+            display:block;margin:1.8em 0;font-style:italic;color:var(--color-text-light);font-size:1rem;
+            cursor: pointer; /* Indicate clickable */
+            text-decoration: none; /* Remove underline */
+            border-bottom: 2px dashed var(--color-text-light); /* Add more visible dashed underline */
+            transition: color var(--transition-speed) ease, border-color var(--transition-speed) ease; /* Smooth hover */
+            padding-bottom: 2px; /* Small padding to not overlap border */
+        }
+         #infoDialog small.is-clickable:hover {
+             color: var(--color-accent-hover); /* Color change on hover */
+             border-color: var(--color-accent-hover); /* Border color change on hover */
+         }
+        /* Style for the reflection prompts container */
+        #dialogPrompts {
+             margin-top: 1.5em;
+             padding-top: 1.5em;
+             border-top: 1px dashed #d1d5db;
+             text-align: left;
+        }
+         #dialogPrompts p {
+              font-size: 1rem; /* Slightly smaller font for prompts */
+              color: var(--color-text);
+              line-height: 1.5;
+              margin-bottom: 0.8em; /* Space between prompts */
+         }
+         #dialogPrompts p:last-child {
+              margin-bottom: 0;
+         }
+
+
+        /* --- Back Button --- */
+        .back-to-hub{margin-top:auto;margin-bottom:20px;padding:.8em 1.8em;background-color:#d1d5db;color:#4b5563;font-size:.9rem;box-shadow:none; /* Added class 'button' in HTML for flexbox */ }
+        .back-to-hub:hover{background-color:#bec5cc;transform:translateY(-1px)}
+
+         /* --- Definition, About, Exercise, and Links Room Specific Styles --- */
+        #room-definition .room-content,
+        #room-about .room-content,
+        #room-exercise .room-content,
+        #room-links .room-content { /* Added links room */
+            max-width: 800px; /* Make content a bit wider for text */
+        }
+        #room-definition p, #room-definition ul, #room-definition li,
+        #room-about p, #room-about ul, #room-about li,
+        #room-exercise p, #room-exercise ul, #room-exercise li,
+        #room-links p, #room-links ul, #room-links li { /* Added links room */
+             text-align: left; /* Left align explanatory text */
+             margin-bottom: 1.5em; /* Increase space between paragraphs */
+             color: var(--color-text); /* Ensure text color is primary */
+             font-size: 1.05rem; /* Slightly smaller font for longer text */
+             line-height: 1.6;
+             margin-left: auto; /* Center text block if it's narrower than container */
+             margin-right: auto;
+             max-width: 700px; /* Limit text block width */
+        }
+         #room-definition ul, #room-about ul, #room-exercise ul, #room-links ul { /* Added links room */
+             padding-left: 20px;
+         }
+        #room-definition li, #room-about li, #room-exercise li, #room-links li { /* Added links room */
+             margin-bottom: 0.8em; /* Space between list items */
+        }
+         #room-about h3, #room-exercise h3, #room-definition h3, #room-links h3 { /* Added exercise room, added definition h3, added links h3 */
+             margin-top: 1.8em; /* Space before subsections */
+             margin-bottom: 0.8em;
+             font-size: 1.4rem;
+             color: var(--color-text);
+             text-align: center;
+             width: 100%; /* Ensure h3 centers correctly */
+         }
+
+         /* Style for the data management buttons */
+         #room-about .data-actions {
+              margin-top: 30px;
+              display: flex;
+              flex-wrap: wrap;
+              justify-content: center;
+              gap: 20px;
+         }
+         #room-about .data-actions .button {
+             flex-grow: 1;
+             max-width: 250px;
+         }
+         #export-data-btn {
+             background-color: var(--color-export-bg);
+         }
+         #export-data-btn:hover {
+             background-color: var(--color-export-hover);
+         }
+         #import-data-btn {
+             background-color: var(--color-import-bg);
+         }
+         #import-data-btn:hover {
+             background-color: var(--color-import-hover);
+         }
+        #import-file-input { /* Hide the default file input */
+            display: none;
+        }
+         /* Style for links list in links section */
+         #room-links ul {
+              list-style: none; /* Remove default bullets */
+              padding: 0; /* Remove default padding */
+              display: flex;
+              flex-direction: column;
+              gap: 15px; /* Space between link items */
+              width: 100%;
+              max-width: 700px;
+              margin: 20px auto;
+         }
+         #room-links li {
+              background-color: var(--color-interactive-bg);
+              border: 1px solid var(--color-interactive-border);
+              border-radius: var(--border-radius);
+              padding: 15px 20px;
+              transition: box-shadow var(--transition-speed) ease, border-color var(--transition-speed) ease;
+         }
+         #room-links li:hover {
+             box-shadow: var(--shadow-light);
+             border-color: var(--color-interactive-hover-border);
+         }
+         #room-links li a {
+             text-decoration: none; /* Remove underline */
+             color: var(--color-accent); /* Use accent color for links */
+             font-weight: 600;
+             display: flex; /* Allow flex properties */
+             flex-direction: column; /* Stack icon and text */
+             align-items: flex-start; /* Align text to left */
+             gap: 5px;
+             width: 100%; /* Ensure link takes full width of LI */
+         }
+          #room-links li a::before {
+               content: '🔗'; /* Link icon */
+               font-size: 1.2em;
+               line-height: 1;
+               color: var(--color-text-light); /* Make icon less prominent */
+           }
+         #room-links li a:hover {
+             color: var(--color-accent-hover);
+         }
+         #room-links .link-description {
+             display: block; /* Ensure description is on its own line */
+             font-size: 0.9em;
+             color: var(--color-text-light);
+             margin-top: 5px; /* Space above description */
+             font-weight: 400;
+         }
+
+
+
+        /* --- Responsive --- */
+        @media (max-width:768px){header h1,.room h2{font-size:1.8rem}.room{padding:25px 15px}.interactive-item{min-width:120px;max-width:160px}#hub .navigation button{min-width:220px}
+        #room-definition p, #room-about p, #room-definition li, #room-about li, #room-exercise p, #room-exercise li, #room-links p, #room-links li { font-size: 1rem; } /* Added links room */
+        #room-about h3, #room-exercise h3, #room-definition h3, #room-links h3 { font-size: 1.2rem; } /* Added links room */
+        }
+        @media (max-width:480px){header h1,.room h2{font-size:1.5rem}body{line-height:1.6}.room{padding:20px 10px}#hub p{font-size:.9rem}.objects-container{gap:10px}.interactive-item{min-width:calc(50% - 15px);max-width:calc(50% - 15px)}#symbol-gallery .interactive-item{min-width:calc(33% - 15px);max-width:calc(33% - 15px)}#infoDialog{width:95%;padding:1.5em}#infoDialog p{font-size:1em}#infoDialog small{font-size:.9em;margin:1em 0}#hub .navigation button{width:90%;min-width:unset}.custom-item{min-width:calc(100% - 10px)}
+        #quiz-question-text{font-size:1.1rem;}.quiz-options label{font-size:1rem;padding:10px}.quiz-options input[type="radio"]{width:18px;height:18px}
+        #next-question-btn{width:100%; align-self: center;}
+        .custom-view-actions .button {width:100%; font-size: 1rem; padding: 0.8em 1.6em; max-width: unset;}
+        #room-definition p, #room-about p, #room-definition li, #room-about li, #room-exercise p, #room-exercise li, #room-links p, #room-links li { font-size: 0.95rem; } /* Added links room */
+        #room-about h3, #room-exercise h3, #room-definition h3, #room-links h3 { font-size: 1.1rem; } /* Added links room */
+        #room-about .data-actions .button { width: 100%; max-width: unset;}
+         /* Adjust link direction back to horizontal on small screens if space allows */
+        #room-links li a { flex-direction: row; justify-content: flex-start;}
+        #room-links li a::before { margin-right: 10px; margin-bottom: 0;}
+        }
+
+    </style>
+</head>
+<body>
+    <header><h1>Pokoje Pustego Gniazda</h1></header>
+    <main id="main-content">
+        <section id="hub" class="room"><div class="room-content"><h2>Witaj w Domu Refleksji</h2><p>To miejsce, gdzie możesz na spokojnie przyjrzeć się swoim emocjom i myśleniu związanym z nowym etapem w życiu, jakim jest "puste gniazdo". Wybierz drzwi do jednego ze standardowych Pokoi, stwórz własną przestrzeń, rozwiąż Quiz, dowiedz się więcej o aplikacji lub wykonaj krótkie ćwiczenie refleksyjne.</p><nav class="navigation"></nav><div id="hub-visual">🌱</div></div></section> <!-- Updated Hub intro text -->
+        <section id="room-definition" class="room"> <!-- Moved definition section here -->
+             <div class="room-content">
+                 <h2>Czym jest Syndrom Pustego Gniazda?</h2>
+                 <p>Syndrom Pustego Gniazda to złożony zestaw emocji i myśli, które mogą pojawić się u rodziców, gdy ich dzieci opuszczają dom, aby rozpocząć samodzielne życie (np. studia, praca, założenie rodziny). Choć opuszczenie domu przez dzieci jest naturalnym etapem rozwoju, dla rodziców może oznaczać znaczącą zmianę w codzienności i poczuciu własnej tożsamości.</p>
+                 <p>To nie jest oficjalna diagnoza medyczna, ale powszechnie uznawane doświadczenie psychologiczne. Charakteryzuje się uczuciami smutku, straty, pustki, niepokoju lub braku celu. Może objawiać się na różne sposoby:</p>
+                 <ul>
+                     <li>Poczucie osamotnienia i ciszy w domu.</li>
+                     <li>Trudność w znalezieniu nowych zajęć lub pasji.</li>
+                     <li>Refleksja nad upływającym czasem i własnym życiem.</li>
+                     <li>Zmiana dynamiki w relacji partnerskiej.</li>
+                     <li>Martwienie się o samodzielność dzieci.</li>
+                 </ul>
+                 <p>Okres po opuszczeniu domu przez dzieci niesie ze sobą również wiele pozytywnych aspektów i możliwości adaptacyjnych. Dla wielu rodziców jest to czas na odkrywanie nowych możliwości:</p>
+                 <h3>Pozytywne Aspekty i Możliwości</h3> <!-- Added Heading -->
+                 <ul>
+                     <li>Nowe możliwości: Czas na realizację własnych pasji, rozwój zawodowy, podróże.</li>
+                     <li>Poprawa relacji partnerskiej: Szansa na "drugi miesiąc miodowy", więcej czasu dla siebie nawzajem.</li>
+                     <li>Redefinicja relacji z dziećmi: Przejście do bardziej partnerskiej relacji dorosły-dorosły.</li>
+                     <li>Wzrost osobisty: Okazja do samopoznania i rozwoju nowych aspektów tożsamości.</li>
+                 </ul>
+                 <p>Warto pamiętać: doświadczenie Pustego Gniazda jest bardzo indywidualne. Dla jednych jest to trudny okres adaptacji, dla innych czas nowych możliwości i swobody. Kluczem jest świadomość tych emocji i aktywne poszukiwanie sposobów na odnalezienie się w nowej rzeczywistości.</p>
+                 <h3>Skuteczne Strategie Radzenia Sobie</h3> <!-- Added Heading -->
+                 <ul>
+                     <li>Akceptacja emocji i pozwolenie sobie na "żałobę".</li>
+                     <li>Redefinicja roli rodzica (wsparcie zamiast kontroli).</li>
+                     <li>Inwestycja w relację partnerską.</li>
+                     <li>Rozwijanie własnych pasji i zainteresowań.</li>
+                     <li>Dbanie o własny dobrostan (zdrowie, odpoczynek).</li>
+                     <li>Aktywne szukanie wsparcia (społecznego, w razie potrzeby profesjonalnego - terapia).</li>
+                 </ul>
+
+                 <p>Pokoje w tej aplikacji zostały stworzone, aby wspierać Cię w tej refleksji i pomóc Ci spojrzeć na ten etap z różnych perspektyw.</p>
+                 <button class="back-to-hub button">Powrót do Menu głównego</button>
+             </div>
+         </section>
+        <section id="room-past" class="room"><div class="room-content"><h2>Echa Przeszłości</h2><div class="objects-container">
+            <button class="interactive-item obj-frame" data-message="Pamiętam ten dzień..." data-reflection="Refleksja: Czy potrafię docenić piękno minionych chwil, jednocześnie żyjąc teraźniejszością?" data-reflection-prompts="Co najbardziej cenisz we wspomnieniach?; Jak przeszłość wpływa na Twoją teraźniejszość?; Czy potrafisz znaleźć równowagę między pamięcią a obecnością?"><span>Ramka</span></button>
+            <button class="interactive-item obj-toy" data-message="Już z tego wyrósł/wyrosła..." data-reflection="Refleksja: Jak zmieniła się moja rola i jak mogę znaleźć nowe sposoby wspierania moich bliskich?" data-reflection-prompts="Jakie nowe formy wsparcia są teraz potrzebne?; Jak rozmawiać z dorosłymi dziećmi?; Co mogę zrobić, by nasza relacja się rozwijała?"><span>Zabawka</span></button>
+            <button class="interactive-item obj-drawing" data-message="Zawsze miał/a wyobraźnię..." data-reflection="Refleksja: Jak mogę wspierać kreatywność i pasje moje i moich bliskich w nowych okolicznościach?" data-reflection-prompts="Czy masz czas na swoje pasje?; Jak zachęcać dzieci do ich pasji bez narzucania się?; Co rozwija Twoją kreatywność teraz?"><span>Rysunek</span></button>
+            <button class="interactive-item obj-growth" data-message="Kiedy to minęło..." data-reflection="Refleksja: Czy jestem dumny/dumna z drogi, którą przeszliśmy, i z tego, kim się stali?" data-reflection-prompts="Z czego jestem najbardziej dumny/dumna?; Jakie wyzwania pokonaliśmy?; Co widzę w dzieciach, co mnie inspiruje?"><span>Miarka</span></button>
+            <button class="interactive-item obj-bike" data-message="Pierwsze samodzielne przejażdżki..." data-reflection="Refleksja: Jakie cechy widzę w moich bliskich, które pomogą im radzić sobie samodzielnie, i jak mogę nadal być dla nich wsparciem?" data-reflection-prompts="Jakie umiejętności dzieci mnie teraz zaskakują?; W czym są lepsi ode mnie?; Jak mogę pomóc, gdy proszą o wsparcie, nie wyręczając?"><span>Rowerek</span></button>
+            </div><button class="easter-egg interactive-item" data-message="Psst! Czasem najwięcej odkrywamy tam, gdzie się nie spodziewamy." data-reflection="Refleksja: Czy jestem otwarty/a na dostrzeganie drobnych, nieoczywistych momentów radości i sensu w codzienności?" data-reflection-prompts="Coś mnie ostatnio zaskoczyło pozytywnie?; Jaka mała rzecz dała mi dziś radość?; Gdzie mogę szukać inspiracji poza utartymi ścieżkami?">✨</button><button class="back-to-hub button">Powrót do Menu głównego</button></div></section>
+        <section id="room-present" class="room"><div class="room-content"><h2>Cisza Teraźniejszości</h2><div class="objects-container">
+            <button class="interactive-item obj-empty-room" data-message="Tak tu teraz cicho..." data-reflection="Refleksja: Czy ta pustka jest też przestrzenią na coś nowego? Co mogę w niej odkryć?" data-reflection-prompts="Jakie nowe dźwięki/ciszę zauważam?; Jak mogę wypełnić tę przestrzeń pozytywnie?; Czego unikałem/am przez brak czasu?"><span>Pusty pokój</span></button>
+            <button class="interactive-item obj-table" data-message="Znowu gotuję za dużo..." data-reflection="Refleksja: Jak mogę zadbać o siebie i swoje potrzeby teraz, gdy mam więcej czasu?" data-reflection-prompts="Jakie są moje podstawowe potrzeby teraz?; Jak mogę wprowadzić nowe, zdrowe nawyki?; Co sprawia, że czuję się dobrze fizycznie i psychicznie?"><span>Nakryty stół</span></button>
+            <button class="interactive-item obj-remote" data-message="Tyle czasu dla siebie..." data-reflection="Refleksja: Czy potrafię być w tej ciszy? Jak mogę wykorzystać ten czas na odpoczynek i regenerację?" data-reflection-prompts="Co naprawdę mnie relaksuje?; Jakie książki/filmy/muzyka czekają na odkrycie?; Czy potrafię cieszyć się samotnością?"><span>Pilot/Książka</span></button>
+            <button class="interactive-item obj-phone" data-message="Telefon... Zadzwonić?" data-reflection="Refleksja: Jak budować nową relację z dorosłymi dziećmi, opartą na wzajemnym szacunku i autonomii?" data-reflection-prompts="Jakie są granice, które muszę szanować?; Jak często chcę/powinienem/powinnam się kontaktować?; Jak wyrażać troskę bez nadmiernej kontroli?"><span>Telefon</span></button>
+            </div><button class="back-to-hub button">Powrót do Menu głównego</button></div></section>
+        <section id="room-future" class="room"><div class="room-content"><h2>Przestrzeń Możliwości</h2><div class="objects-container">
+            <button class="interactive-item obj-suitcase" data-message="Świat czeka..." data-reflection="Refleksja: Co mnie powstrzymuje przed realizacją marzeń i planów, które odkładałem/am?" data-reflection-prompts="Jakie mam niewykorzystane marzenia?; Co jest pierwszym krokiem do ich realizacji?; Jakie obawy mnie blokują?"><span>Walizka/Mapa</span></button>
+            <button class="interactive-item obj-tools" data-message="Zawsze chciałem/am spróbować..." data-reflection="Refleksja: Jakie pasje, hobby lub umiejętności czekają na odkrycie lub rozwój?" data-reflection-prompts="Co mnie kiedyś interesowało?; Czego zawsze chciałem/am się nauczyć?; Jak mogę zacząć małymi krokami?"><span>Narzędzia/Hobby</span></button>
+            <button class="interactive-item obj-books" data-message="Nauka języka?..." data-reflection="Refleksja: Jak mogę inwestować w swój rozwój osobisty i intelektualny?" data-reflection-prompts="Czego chciałbym/chciałabym się nauczyć?; Jakie kursy/książki mnie interesują?; Jak wyznaczyć sobie cele edukacyjne?"><span>Książki/Notatnik</span></button>
+            <button class="interactive-item obj-mirror" data-message="Kim jestem teraz..." data-reflection="Refleksja: Jakie są moje mocne strony i wartości, które mogę teraz w pełni wykorzystać?" data-reflection-prompts="Jakie są moje kluczowe wartości?; Jakie cechy charakteru pomogły mi dotrzeć tu, gdzie jestem?; W czym czuję się pewnie teraz?"><span>Lustro</span></button>
+            </div><button class="back-to-hub button">Powrót do Menu głównego</button></div></section>
+        <section id="room-rebuilt" class="room"><div class="room-content"><h2>Odbudowane Gniazdo</h2><div class="objects-container">
+            <button class="interactive-item obj-calendar" data-message="Tyle ciekawych rzeczy..." data-reflection="Refleksja: Jak wygląda moja codzienna rutyna i czy daje mi poczucie spełnienia i radości?" data-reflection-prompts="Co w moim dniu daje mi najwięcej energii?; Jakie aktywności dodają mi radości?; Jak mogę zorganizować czas, by był satysfakcjonujący?"><span>Kalendarz</span></button>
+            <button class="interactive-item obj-new-photos" data-message="Buduję nowe wspomnienia..." data-reflection="Refleksja: Jak pielęgnuję relacje z partnerem/partnerką, przyjaciółmi i rodziną w nowej sytuacji?" data-reflection-prompts="Jak mogę spędzać czas z partnerem/partnerką teraz?; Jak często kontaktować się z dziećmi?; Kto w moim otoczeniu daje mi wsparcie?"><span>Nowe zdjęcia</span></button>
+            <button class="interactive-item obj-project" data-message="Daje mi to radość..." data-reflection="Refleksja: Co sprawia, że czuję się spełniony/a i zaangażowany/a w życie poza rolą rodzica?"><span>Projekt</span></button>
+            <button class="interactive-item obj-armchair" data-message="Nauczyłem/am się odpoczywać..." data-reflection="Refleksja: Jak dbam o siebie fizycznie, psychicznie i emocjonalnie?" data-reflection-prompts="Co mogę zrobić dla swojego ciała?; Jakie działania wspierają mój spokój ducha?; Czy potrzebuję pomocy specjalisty?"><span>Fotel</span></button>
+            </div><button class="back-to-hub button">Powrót do Menu głównego</button></div></section>
+        <section id="room-custom-creator" class="room"><div class="room-content"><h2>Kreator Twojego Pokoju Refleksji</h2><p>Wybierz 1 do 5 symboli, które najlepiej oddają Twoje obecne myśli i uczucia.</p><div id="symbol-gallery" class="objects-container"><button class="interactive-item obj-symbol-passion" data-id="passion"><span>Pasja/Hobby</span></button><button class="interactive-item obj-symbol-relation" data-id="relation"><span>Relacje</span></button><button class="interactive-item obj-symbol-goal" data-id="goal"><span>Cel/Kierunek</span></button><button class="interactive-item obj-symbol-memory" data-id="memory"><span>Wspomnienie</span></button><button class="interactive-item obj-symbol-nature" data-id="nature"><span>Natura/Spokój</span></button><button class="interactive-item obj-symbol-travel" data-id="travel"><span>Podróże</span></button><button class="interactive-item obj-symbol-learning" data-id="learning"><span>Nauka/Rozwój</span></button><button class="interactive-item obj-symbol-selfcare" data-id="selfcare"><span>Dbanie o siebie</span></button></div><div id="creator-actions"><button id="create-custom-room-btn" disabled class="button">Stwórz Mój Pokój</button><p id="selection-info"></p></div><button class="back-to-hub button" style="margin-top:30px">Anuluj</button></div></section>
+        <section id="room-custom-view" class="room" data-loaded-room-name=""> <!-- Add data attribute -->
+            <div class="room-content">
+                <h2 id="custom-room-view-title">Twój Osobisty Pokój Refleksji</h2> <!-- Added ID for title -->
+                <p>Zapisz swoje myśli przy wybranych symbolach.</p>
+                <div id="custom-room-items" class="objects-container"></div>
+                <div class="custom-view-actions"> <!-- Container for buttons -->
+                     <button id="save-custom-room-btn" class="button">Zapisz ten pokój</button> <!-- Default text -->
+                     <button id="delete-custom-room-btn" class="button" style="display: none;">Usuń ten pokój</button> <!-- New Delete Button -->
+                     <button class="back-to-hub button">Powrót do Menu głównego</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- === NOWA SEKCJA QUIZU === -->
+        <section id="room-quiz" class="room">
+            <div class="room-content">
+                <h2>Quiz Refleksji</h2>
+                <p id="quiz-intro">Odpowiedz na kilka pytań, aby pogłębić refleksję nad nowym etapem.</p>
+                <div id="quiz-container">
+                    <div id="question-area">
+                        <p id="quiz-question-text"></p>
+                        <div id="quiz-options">
+                            <!-- Opcje odpowiedzi będą generowane przez JS -->
+                        </div>
+                    </div>
+                    <div id="quiz-result-area" style="display: none;">
+                        <p id="quiz-score">Podsumowanie Refleksji</p> <!-- Changed text -->
+                        <div id="quiz-feedback">
+                             <!-- Feedback will be generated here -->
+                        </div>
+                        <button id="retake-quiz-btn" class="button">Spróbuj ponownie</button>
+                    </div>
+                    <button id="next-question-btn" class="button" disabled>Następne pytanie</button>
+                </div>
+                <button class="back-to-hub button">Powrót do Menu głównego</button>
+            </div>
+        </section>
+        <!-- === KONIEC NOWEJ SEKCJI === -->
+
+        <!-- === NOWA SEKCJA O APLIKACJI === -->
+         <section id="room-about" class="room">
+             <div class="room-content">
+                 <h2>O aplikacji i jak działa</h2>
+                 <p>Witaj w aplikacji "Pokoje Pustego Gniazda", zaprojektowanej jako przestrzeń do spokojnej refleksji nad doświadczeniem opuszczenia domu przez dzieci. Aplikacja ma na celu pomóc Ci zidentyfikować i przetworzyć emocje, myśli i możliwości związane z tym nowym etapem życia.</p>
+
+                 <h3>Jak korzystać z Pokoi?</h3>
+                 <p>Menu główne prowadzi do różnych "Pokoi", z których każdy symbolizuje inną perspektywę:</p>
+                 <ul>
+                     <li><strong>Przeszłość:</strong> Pomaga przyjrzeć się wspomnieniom i drodze, którą przeszliście razem z dziećmi.</li>
+                     <li><strong>Teraźniejszość:</strong> Skupia się na obecnych uczuciach, zmianach w domu i codzienności.</li>
+                     <li><strong>Możliwości:</strong> Zachęca do spojrzenia w przyszłość, odkrywania nowych pasji i celów.</li>
+                     <li><strong>Integracja (Odbudowane Gniazdo):</strong> Dotyczy adaptacji do nowej sytuacji, budowania nowych rutyn i pielęgnowania relacji (także tych z dorosłymi dziećmi).</li>
+                 </ul>
+                 <p>W każdym z tych pokoi znajdziesz interaktywne obiekty. Kliknięcie na obiekt wyświetli myśl przewodnią. Po wyświetleniu myśli, kliknij na **pytanie refleksyjne** (tekst pisany kursywą), aby zobaczyć przykładowe podpowiedzi i pytania pomocnicze, które pomogą Ci pogłębić myśl. Kliknij ponownie na pytanie refleksyjne, aby ukryć podpowiedzi.</p> <!-- Updated text -->
+
+                 <h3>Twój Osobisty Pokój</h3>
+                 <p>W sekcji "Twój Pokój" możesz stworzyć własną przestrzeń refleksji. W Kreatorze wybierz symbole, które najlepiej oddają Twoje aktualne myśli, uczucia lub obszary życia, na których chcesz się skupić (min. 1, max. 5 symboli). Następnie kliknij "Stwórz Mój Pokój".</p>
+                 <p>W Twoim Osobistym Pokoju możesz kliknąć na każdy symbol i zapisać własne notatki lub refleksje w polu tekstowym. Użyj przycisku "Zapisz Notatkę" pod polem, aby zapisać swoje przemyślenia w pamięci przeglądarki. Możesz wrócić do tego pokoju w dowolnym momencie, a Twoje notatki będą tam czekać.</p>
+                 <p>Pokój możesz zapisać pod własną nazwą, używając przycisku "Zapisz/Zaktualizuj ten pokój". Zapisany pokój pojawi się jako osobny przycisk w Menu głównym. Jeśli załadujesz zapisany pokój, pojawi się też opcja "Usuń ten pokój", która pozwoli na usunięcie go z menu. Pamiętaj, że usunięcie pokoju usuwa go z menu, ale notatki dla symboli pozostają zapisane w przeglądarce, chyba że usuniesz je ręcznie w polu tekstowym.</p>
+
+                 <h3>Quiz Refleksji</h3>
+                 <p>Quiz to dodatkowe narzędzie do pogłębionej refleksji. Odpowiedz na pytania, które skłaniają do zastanowienia się nad różnymi aspektami doświadczenia "pustego gniazda". Na końcu otrzymasz podsumowanie z myślami i wskazówkami opartymi na Twoich odpowiedziach.</p>
+
+                 <h3>Prywatność i Zarządzanie Danymi</h3>
+                 <p>Wszystkie Twoje notatki i zapisane pokoje są przechowywane **wyłącznie w pamięci Twojej przeglądarki (localStorage)**. Oznacza to, że nikt inny nie ma do nich dostępu, ale także, że dane te mogą zostać utracone, jeśli wyczyścisz pamięć przeglądarki lub skorzystasz z innej przeglądarki/urządzenia.</p>
+                 <p>Aby zabezpieczyć swoje dane lub przenieść je na inne urządzenie/przeglądarkę, możesz użyć opcji eksportu i importu:</p>
+                 <div class="data-actions">
+                     <button id="export-data-btn" class="button">Eksportuj dane</button>
+                     <button id="import-data-btn" class="button">Importuj dane</button>
+                     <input type="file" id="import-file-input" accept=".json"> <!-- Hidden file input -->
+                 </div>
+
+
+                 <p>Mamy nadzieję, że ta aplikacja okaże się pomocna w Twojej podróży przez ten ważny etap życia.</p>
+
+                 <button class="back-to-hub button">Powrót do Menu głównego</button>
+             </div>
+         </section>
+        <!-- === KONIEC NOWEJ SEKCJI === -->
+
+         <!-- === NOWA SEKCJA ĆWICZENIA === -->
+         <section id="room-exercise" class="room">
+             <div class="room-content">
+                 <h2>Ćwiczenie: Co Dalej?</h2>
+                 <p>Syndrom Pustego Gniazda to duża zmiana, ale każda zmiana otwiera nowe drzwi. Ten etap w życiu, choć bywa wyzwaniem, często daje też więcej swobody i czasu na realizację własnych potrzeb i marzeń, które mogły być odkładane na później.</p>
+                 <p>Pomyśl przez chwilę o czymś, co możesz teraz zrobić lub zacząć, mając więcej czasu lub przestrzeni, czego wcześniej nie było łatwo zrealizować.</p>
+
+                 <h3>Przykłady możliwości:</h3>
+                 <ul>
+                     <li>Rozwijanie nowego hobby lub powrót do starego (np. malowanie, ogrodnictwo, gra na instrumencie).</li>
+                     <li>Podróżowanie lub częstsze wycieczki.</li>
+                     <li>Nauka czegoś zupełnie nowego (język obcy, kurs online).</li>
+                     <li>Intensywniejsze pielęgnowanie relacji z partnerem/partnerką, przyjaciółmi, rodzeństwem.</li>
+                     <li>Zaangażowanie w wolontariat lub działalność społeczną.</li>
+                     <li>Skupienie się na zdrowiu fizycznym i psychicznym (sport, medytacja, dbanie o siebie).</li>
+                     <li>Realizacja projektów "zrób to sam" lub remontowych w domu.</li>
+                 </ul>
+
+                 <h3>Twoje zadanie:</h3>
+                 <p>Wybierz **JEDNĄ** taką możliwość z listy powyżej lub pomyśl o swojej własnej, która najbardziej do Ciebie przemawia w tym momencie.</p>
+                 <p>Zastanów się:</p>
+                 <ul>
+                     <li>Dlaczego właśnie ta możliwość jest dla Ciebie ważna TERAZ?</li>
+                     <li>Jakie małe kroki możesz zrobić w ciągu najbliższego tygodnia, aby przybliżyć się do jej realizacji?</li>
+                     <li>Jak ta możliwość wpisuje się w budowanie Twojego "Odbudowanego Gniazda"?</li>
+                 </ul>
+                 <p>Możesz zapisać swoje myśli w swoim Osobistym Pokoju, tworząc go z symboli, które rezonują z tym ćwiczeniem (np. Pasja/Hobby, Cel/Kierunek, Dbanie o siebie, Podróże).</p>
+
+                 <button class="back-to-hub button">Powrót do Menu głównego</button>
+             </div>
+         </section>
+        <!-- === KONIEC NOWEJ SEKCJI === -->
+
+        <!-- === NOWA SEKCJA LINKÓW ZEWNĘTRZNYCH === -->
+         <section id="room-links" class="room">
+             <div class="room-content">
+                 <h2>Dodatkowe Zasoby i Linki</h2>
+                 <p>Jeśli chcesz dowiedzieć się więcej o syndromie pustego gniazda, znaleźć wsparcie lub poszukać inspiracji do nowych aktywności, poniżej znajdziesz kilka przydatnych linków do zewnętrznych stron internetowych.</p>
+                  <h3>Przydatne linki:</h3>
+                  <ul>
+                      <li>
+                          <a href="https://portal.librus.pl/rodzina/artykuly/czy-syndrom-pustego-gniazda-jest-nieunikniony" target="_blank" rel="noopener noreferrer">
+                              Czy syndrom pustego gniazda jest nieunikniony? - Librus
+                              <span class="link-description">Artykuł omawiający naturę syndromu i możliwości radzenia sobie.</span>
+                          </a>
+                      </li>
+                       <li>
+                          <a href="https://spokojwglowie.pl/syndrom-pustego-gniazda/" target="_blank" rel="noopener noreferrer">
+                              Syndrom pustego gniazda - spokojnawglowie.pl
+                              <span class="link-description">Inny artykuł z perspektywą psychologiczną i praktycznymi wskazówkami.</span>
+                          </a>
+                      </li>
+                       <li>
+                          <a href="https://bc.upjp2.edu.pl/Content/5852/Syndrom%20pustego%20gniazda%20repoz.pdf" target="_blank" rel="noopener noreferrer">
+                              Syndrom pustego gniazda - Uniwersytet Papieski Jana Pawła II (plik PDF)
+                              <span class="link-description">Bardziej akademickie opracowanie tematu w formie publikacji.</span>
+                          </a>
+                      </li>
+                       <li>
+                          <a href="https://sosrozwod.pl/najczestsze-problemy-malzenskie/syndrom-pustego-gniazda" target="_blank" rel="noopener noreferrer">
+                              Syndrom pustego gniazda a problemy małżeńskie - sosrozwod.pl
+                              <span class="link-description">Analiza wpływu syndromu na relację partnerską.</span>
+                          </a>
+                      </li>
+                  </ul>
+                 <p><small>Pamiętaj, że aplikacja "Pokoje Pustego Gniazda" jest narzędziem do autorefleksji i nie zastąpi profesjonalnej pomocy psychologicznej. Jeśli odczuwasz silne, przytłaczające emocje, skonsultuj się ze specjalistą.</small></p>
+                 <button class="back-to-hub button">Powrót do Menu głównego</button>
+             </div>
+         </section>
+        <!-- === KONIEC NOWEJ SEKCJI === -->
+
+
+    </main>
+    <footer><p>&copy; Projekt Pokoje Pustego Gniazda</p></footer>
+    <dialog id="infoDialog"><p id="dialogMessage"></p><small id="dialogReflection"></small><div id="dialogPrompts" style="display: none;"></div><div class="modal-actions"><form method="dialog"><button id="dialogCloseButton">Zamknij</button></form></div></dialog> <!-- Added dialogPrompts div -->
+
+    <script>
+        // === JavaScript v20.0 (Updated Links & Reflection Style) ===
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("v20.0 DOM loaded. Initializing...");
+
+            const mainContent = document.getElementById('main-content');
+            const hubNavigation = mainContent.querySelector('#hub .navigation'); // Get the navigation container
+            const infoDialog = document.getElementById('infoDialog'); // Renamed for clarity
+            const dialogMessage = document.getElementById('dialogMessage');
+            const dialogReflection = document.getElementById('dialogReflection');
+            const dialogPrompts = document.getElementById('dialogPrompts'); // New prompts element
+            const hubVisual = document.getElementById('hub-visual');
+            const symbolGallery = document.getElementById('symbol-gallery');
+            const createCustomRoomBtn = document.getElementById('create-custom-room-btn');
+            const customRoomItemsContainer = document.getElementById('custom-room-items');
+            const selectionInfo = document.getElementById('selection-info');
+            const roomCustomViewSection = document.getElementById('room-custom-view'); // Get the view section
+            const customRoomViewTitle = document.getElementById('custom-room-view-title'); // Get the title element
+            const saveCustomRoomBtn = document.getElementById('save-custom-room-btn');
+            const deleteCustomRoomBtn = document.getElementById('delete-custom-room-btn'); // New delete button
+
+            // Quiz elements
+            const quizContainer = document.getElementById('quiz-container');
+            const questionArea = document.getElementById('question-area');
+            const resultArea = document.getElementById('quiz-result-area');
+            const quizQuestionText = document.getElementById('quiz-question-text');
+            const quizOptions = document.getElementById('quiz-options');
+            const quizScoreElement = document.getElementById('quiz-score'); // Now summary header
+            const quizFeedbackElement = document.getElementById('quiz-feedback');
+            const nextQuestionBtn = document.getElementById('next-question-btn');
+            const retakeQuizBtn = document.getElementById('retake-quiz-btn');
+
+             // Definition, About, Exercise, and Links Room elements
+             const roomDefinitionSection = document.getElementById('room-definition');
+             const roomAboutSection = document.getElementById('room-about');
+             const roomExerciseSection = document.getElementById('room-exercise'); // New Exercise section
+             const roomLinksSection = document.getElementById('room-links'); // New Links section
+
+
+             // Data Management elements
+             const exportDataBtn = document.getElementById('export-data-btn');
+             const importDataBtn = document.getElementById('import-data-btn');
+             const importFileInput = document.getElementById('import-file-input');
+
+
+            // Check if all essential elements exist
+            const essentialElements = [mainContent, hubNavigation, infoDialog, dialogMessage, dialogReflection, dialogPrompts, hubVisual, symbolGallery, createCustomRoomBtn, customRoomItemsContainer, selectionInfo, roomCustomViewSection, customRoomViewTitle, saveCustomRoomBtn, deleteCustomRoomBtn, quizContainer, questionArea, resultArea, quizQuestionText, quizOptions, quizScoreElement, quizFeedbackElement, nextQuestionBtn, retakeQuizBtn, roomDefinitionSection, roomAboutSection, roomExerciseSection, roomLinksSection, exportDataBtn, importDataBtn, importFileInput]; // Added all new sections and data elements
+            if (essentialElements.some(el => !el)) {
+                 console.error("Initialization failed: Missing essential elements!", essentialElements.map((el, i) => !el ? `Element ${i} missing` : ''));
+                 return;
+            }
+            console.log("Essential elements found.");
+
+
+            let selectedSymbols = []; // Used for the custom room CREATOR state
+            const MAX_SYMBOLS = 5; const MIN_SYMBOLS = 1;
+
+             // Define rooms with grouping information and order
+             const roomGroups = [
+                 {
+                     heading: 'Informacje i wprowadzenie',
+                     rooms: [
+                         { id: 'room-about', label: 'O aplikacji', iconClass: 'about-icon' },
+                         { id: 'room-definition', label: 'Czym jest Puste Gniazda?', iconClass: 'definition-icon' },
+                         { id: 'room-links', label: 'Linki zewnętrzne', iconClass: 'links-icon' } // Added Links here
+                     ]
+                 },
+                 {
+                     heading: 'Pokoje refleksji',
+                     rooms: [
+                         { id: 'room-past', label: 'Przeszłość', iconClass: 'obj-past' },
+                         { id: 'room-present', label: 'Teraźniejszość', iconClass: 'obj-present' },
+                         { id: 'room-future', label: 'Możliwości', iconClass: 'obj-future' },
+                         { id: 'room-rebuilt', label: 'Integracja', iconClass: 'obj-rebuilt' },
+                     ]
+                 },
+                  {
+                      heading: 'Twoja przestrzeń',
+                      rooms: [
+                           { id: 'room-custom-creator', label: 'Stwórz Swój Pokój', iconClass: 'obj-custom-creator' }, // Changed label slightly
+                           // Saved rooms will be appended here dynamically
+                       ]
+                  },
+                  {
+                       heading: 'Narzędzia i ćwiczenia', // New group for Quiz and Exercise
+                       rooms: [
+                           { id: 'room-quiz', label: 'Quiz Refleksji', iconClass: 'quiz-icon' },
+                           { id: 'room-exercise', label: 'Ćwiczenie', iconClass: 'exercise-icon' }
+                       ]
+                  }
+             ];
+
+             // Flatten the list of all standard room IDs for internal use
+             const standardRooms = roomGroups.reduce((acc, group) => acc.concat(group.rooms), []);
+             const roomIds = ['hub'].concat(standardRooms.map(r => r.id), 'room-custom-view');
+
+
+            // === Quiz Data (Reflective) ===
+            // Keeping the reflective questions and feedback snippets from v13.0
+             const quizQuestions = [
+                 {
+                     question: "Gdy myślisz o nowej ilości wolnego czasu, co czujesz najczęściej?",
+                     options: ["Niepokój i pustkę", "Ekscytację na myś o nowych aktywnościach", "Zmęczenie i potrzebę odpoczynku", "Akceptację i spokój"],
+                     // Define feedback snippets based on answer index
+                     feedbackSnippets: [
+                          "Poczucie niepokoju i pustki w nowej sytuacji jest zupełnie naturalne. Daj sobie czas na oswojenie się z tą zmianą.", // Answer 0
+                          "Ekscytacja nowymi możliwościami to wspaniała energia! Wykorzystaj ją do odkrywania tego, co dla Ciebie ważne.", // Answer 1
+                          "Jeśli czujesz zmęczenie, to sygnał, że potrzebujesz odpoczynku. Nowy etap to też szansa na zadbanie o siebie.", // Answer 2
+                          "Akceptacja i spokój w obliczu zmiany to cenna postawa. Pozwala ona świadomie budować nową codzienność." // Answer 3
+                     ]
+                 },
+                 {
+                     question: "Jak postrzegasz swoją rolę w życiu dorosłych dzieci?",
+                     options: ["Nadal są moimi dziećmi, potrzebują mnie jak zawsze", "Jestem dostępnym wsparciem, ale szanuję ich niezależność", "Powinni radzić sobie sami, nie chcę się wtrącać", "Nie wiem, czuję się zagubiony/a w tej relacji"],
+                     feedbackSnippets: [
+                          "Zmiana dynamiki relacji z dorosłymi dziećmi bywa wyzwaniem. Ważne jest znalezienie nowej równowagi.", // Answer 0
+                          "Rola wspierającego rodzica, który szanuje niezależność, to dojrzałe podejście. Pozwala budować silne więzi na nowych zasadach.", // Answer 1
+                          "Czasem trudno jest puścić kontrolę, ale danie dorosłym dzieciom przestrzeni wspiera ich samodzielność i wzmacnia zaufanie.", // Answer 2
+                          "Poczucie zagubienia w relacji to punkt wyjścia do rozmowy i ustalenia nowych, wzajemnie komfortowych granic." // Answer 3
+                     ]
+                 },
+                 {
+                     question: "Co sprawia Ci najwięcej trudności w zaadaptowaniu się do 'pustego gniazda'?",
+                     options: ["Brak codziennego hałasu i obecności dzieci", "Zorganizowanie czasu tylko dla siebie", "Zmiana relacji z partnerem/partnerką", "Poczucie, że moja rola się skończyła"],
+                     feedbackSnippets: [
+                         "Tęsknota za codzienną obecnością dzieci jest naturalną częścią procesu adaptacji. Daj sobie prawo do tych uczuć.", // Answer 0
+                         "Przeorganizowanie czasu i znalezienie miejsca na własne potrzeby może być wyzwaniem, ale otwiera drzwi do nowych pasji.", // Answer 1
+                         "Etap pustego gniazda często redefiniuje relację partnerską. To szansa na odkrycie siebie nawzajem na nowo.", // Answer 2
+                         "Twoja rola rodzica nie kończy się, ona się zmienia. Masz teraz szansę odkryć nowe aspekty swojej tożsamości." // Answer 3
+                     ]
+                 },
+                 {
+                      question: "Jaka aktywność dla siebie najbardziej rezonuje z Toba w tej chwili?",
+                      options: ["Odkrywanie nowych pasji lub powrót do starych", "Spędzanie więcej czasu ze znajomymi/rodziną", "Poświęcenie się pracy lub wolontariatowi", "Po prostu odpoczynek i 'nicnierobienie'"],
+                      feedbackSnippets: [
+                          "Odkrywanie pasji dodaje życiu barw i nowego sensu. Coś czeka na Ciebie?", // Answer 0
+                          "Bliskie relacje są źródłem wsparcia i radości. Warto w nie inwestować swój czas.", // Answer 1
+                          "Zaangażowanie w pracę lub pomoc innym może przynieść ogromne poczucie spełnienia i celowości.", // Answer 2
+                          "Pozwolenie sobie na odpoczynek jest kluczowe dla regeneracji. Masz prawo po prostu BYĆ." // Answer 3
+                     ]
+                 },
+                 {
+                     question: "Co symbolizuje dla Ciebie 'Odbudowane Gniazdo'?",
+                     options: ["Koniec pewnego etapu", "Nowy dom, już bez dzieci", "Adaptację i znalezienie nowego sensu", "Trudny czas, który trzeba przetrwać"],
+                     feedbackSnippets: [
+                         "Tak, to koniec ważnego etapu, ale każdy koniec jest też początkiem czegoś nowego.", // Answer 0
+                         "Dom się zmienia, tak jak role jego mieszkańców. To przestrzeń, którą możesz teraz kształtować po swojemu.", // Answer 1
+                         "'Odbudowane gniazdo' to symbol Twojej siły i zdolności do adaptacji. Znajdź w nim swoje szczęście.", // Answer 2
+                         "Nawet w trudnym czasie jest miejsce na budowanie czegoś trwałego i dającego radość." // Answer 3
+                     ]
+                 }
+             ];
+
+             let currentQuestionIndex = 0;
+             let score = 0; // Score is less important now, but can be kept
+             let userAnswers = []; // Array to store chosen indices for feedback generation
+
+             // === Saved Custom Rooms Data ===
+             const SAVED_ROOMS_STORAGE_KEY = 'pg-saved-rooms'; // Key for localStorage
+             const CUSTOM_REFLECTION_STORAGE_PREFIX = 'custom-reflection-'; // Prefix for reflection notes
+             const CREATOR_SELECTION_STORAGE_KEY = 'custom-creator-selection'; // Key for creator selection
+             let savedRooms = []; // Array to hold saved room objects { name: string, symbols: string[] }
+
+             // --- Data Management Keys ---
+             // List all localStorage keys used by the application for export/import
+             const localStorageKeys = [
+                 SAVED_ROOMS_STORAGE_KEY,
+                 CREATOR_SELECTION_STORAGE_KEY,
+                 // We also need all individual reflection notes. We'll collect these dynamically.
+                 'room-past-visited', 'room-present-visited', 'room-future-visited', 'room-rebuilt-visited' // Include visited flags for standard rooms
+                 // Note: lastVisitedRoom is not included in export/import as it's temporary state
+             ];
+
+
+            // --- Funkcje Pomocnicze ---
+            function switchSection(targetId, savedRoomData = null) { // savedRoomData might be { name: string, symbols: string[] }
+                 const currentActive = mainContent.querySelector('.room.is-active');
+                 const newActive = document.getElementById(targetId);
+
+                 // Handle 'back-to-hub' target specifically for consistency
+                 if (targetId === 'hub') {
+                      if (currentActive) currentActive.classList.remove('is-active');
+                     document.getElementById('hub')?.classList.add('is-active');
+                     localStorage.removeItem('lastVisitedRoom');
+                     updateHubVisuals();
+                     return; // Exit the function early
+                 }
+
+
+                 if (currentActive) currentActive.classList.remove('is-active');
+
+                 if (newActive && newActive.classList.contains('room')) {
+                     newActive.scrollTop = 0;
+                     newActive.classList.add('is-active');
+                     // Only save specific rooms as last visited
+                     const savableRooms = standardRooms.filter(r => ['room-past', 'room-present', 'room-future', 'room-rebuilt', 'room-custom-creator', 'room-custom-view'].includes(r.id)).map(r => r.id); // Exclude special info/quiz/exercise rooms
+                     if (savableRooms.includes(targetId)) {
+                         localStorage.setItem('lastVisitedRoom', targetId);
+                     } else {
+                          localStorage.removeItem('lastVisitedRoom'); // Don't remember other rooms
+                     }
+
+
+                     updateHubVisuals();
+
+                     // Special handling based on the target section
+                     if (targetId === 'room-quiz') {
+                         startQuiz();
+                     } else if (targetId === 'room-custom-view') {
+                         // If switching to custom view from a saved room button (savedRoomData provided),
+                         // load those symbols and mark the section with the room name.
+                         // If switching from the creator (no savedRoomData),
+                         // load the current selected symbols and indicate it's not a saved room.
+                         if (savedRoomData) {
+                             generateCustomRoomView(savedRoomData.symbols);
+                             roomCustomViewSection.dataset.loadedRoomName = savedRoomData.name;
+                             customRoomViewTitle.textContent = savedRoomData.name; // Set title
+                             deleteCustomRoomBtn.style.display = 'inline-block'; // Show delete button for saved rooms
+                             saveCustomRoomBtn.textContent = 'Zaktualizuj ten pokój'; // Change button text
+                         } else {
+                             // Coming from creator or initially loading custom view without saved data
+                             generateCustomRoomView(selectedSymbols); // Use creator's selection
+                             roomCustomViewSection.dataset.loadedRoomName = ''; // Clear loaded name
+                             customRoomViewTitle.textContent = 'Twój Osobisty Pokój Refleksji'; // Reset title
+                             deleteCustomRoomBtn.style.display = 'none'; // Hide delete button
+                             saveCustomRoomBtn.textContent = 'Zapisz ten pokój'; // Change button text
+                         }
+                     }
+                     // No specific JS logic needed for other info/tool rooms currently
+
+
+                 } else {
+                     console.error(`Target section #${targetId} invalid!`);
+                     // Fallback to hub if target is invalid
+                     document.getElementById('hub')?.classList.add('is-active');
+                     localStorage.removeItem('lastVisitedRoom');
+                     updateHubVisuals();
+                 }
+            }
+
+            function updateHubVisuals() {
+                 if(!hubVisual) return;
+                 let visitedCount=0;
+                 // Count visited main rooms (Past, Present, Future, Rebuilt)
+                 const mainRoomsToCount = standardRooms.filter(r => ['room-past', 'room-present', 'room-future', 'room-rebuilt'].includes(r.id));
+                 mainRoomsToCount.forEach(room => {
+                     if(localStorage.getItem(room.id + '-visited') === 'true') {
+                         visitedCount++;
+                     }
+                 });
+                 const totalMainRooms = mainRoomsToCount.length;
+                 const icon=visitedCount>=totalMainRooms?'🌳':visitedCount>=Math.ceil(totalMainRooms/2)?'🌿':visitedCount>0?'🌱':'⚪';
+                 hubVisual.textContent=icon;
+                 hubVisual.style.transform='scale(1.1)'; setTimeout(()=>{hubVisual.style.transform='scale(1)';},300);
+             }
+
+            // Re-using the infoDialog for messages, now centered via CSS
+             // Modified to handle reflection prompts data
+            function showMessage(mainMsg, reflectionMsg, reflectionPrompts = null) {
+                 dialogMessage.textContent = mainMsg || "";
+                 dialogReflection.textContent = reflectionMsg || "";
+                 dialogReflection.style.display = reflectionMsg ? 'block' : 'none';
+
+                 dialogPrompts.innerHTML = ''; // Clear previous prompts
+                 dialogPrompts.style.display = 'none'; // Hide prompts container
+                 infoDialog.dataset.currentPrompts = reflectionPrompts || ''; // Store prompts on the dialog element
+
+                 // Make reflection text clickable only if prompts exist
+                 if (reflectionPrompts) {
+                      dialogReflection.classList.add('is-clickable'); // Add class for styling
+                 } else {
+                      dialogReflection.classList.remove('is-clickable'); // Remove class
+                 }
+
+                 // Always close any open dialog before showing a new one
+                 if (infoDialog.hasAttribute('open')) infoDialog.close();
+                 try { infoDialog.showModal(); } catch (e) { console.error("Show modal error:", e); }
+             }
+
+            function hideMessage() {
+                 if (infoDialog && infoDialog.open) {
+                      infoDialog.close();
+                       // Clean up dialog state after closing
+                       dialogMessage.textContent = "";
+                       dialogReflection.textContent = "";
+                       dialogReflection.classList.remove('is-clickable'); // Remove clickable class on hide
+                       dialogPrompts.innerHTML = '';
+                       dialogPrompts.style.display = 'none';
+                       infoDialog.dataset.currentPrompts = '';
+                  }
+             }
+
+            // --- Custom Room Creator/View Functions ---
+
+            function updateSelectionInfo() {
+                 const count = selectedSymbols.length;
+                 selectionInfo.textContent = `Wybrano ${count} z ${MAX_SYMBOLS} symboli. (${MIN_SYMBOLS}-${MAX_SYMBOLS} wymagane)`;
+                 createCustomRoomBtn.disabled = count < MIN_SYMBOLS || count > MAX_SYMBOLS;
+            }
+
+            // Modified to accept an optional symbols array
+            function generateCustomRoomView(symbolsToDisplay = selectedSymbols) {
+                customRoomItemsContainer.innerHTML = '';
+                if (!symbolsToDisplay || symbolsToDisplay.length === 0) {
+                    customRoomItemsContainer.innerHTML = '<p style="text-align: center; width: 100%;">Brak symboli do wyświetlenia. Wybierz je w kreatorze!</p>';
+                    // Also ensure save/delete buttons are hidden if empty (delete button is also controlled by data-loaded-room-name)
+                     saveCustomRoomBtn.style.display = 'none'; // Hide save button if nothing to save
+                    // Keep delete button state based on data-loaded-room-name
+                    return;
+                }
+
+                saveCustomRoomBtn.style.display = 'inline-block';
+
+
+                // Get the list of all possible symbol buttons from the creator gallery
+                const allSymbolButtons = Array.from(symbolGallery.querySelectorAll('.interactive-item[data-id]'));
+
+                symbolsToDisplay.forEach(symbolId => {
+                     const originalBtn = allSymbolButtons.find(btn => btn.dataset.id === symbolId);
+
+                     if (!originalBtn) {
+                         console.warn(`Symbol ID "${symbolId}" not found in gallery.`);
+                         return;
+                     }
+
+                     const iconClass = Array.from(originalBtn.classList).find(cls => cls.startsWith('obj-symbol-'));
+                     const labelText = originalBtn.querySelector('span')?.textContent || symbolId;
+                     // Load the saved reflection text for THIS specific symbol ID
+                     const savedReflection = localStorage.getItem(`${CUSTOM_REFLECTION_STORAGE_PREFIX}${symbolId}`) || "";
+
+                     const itemDiv = document.createElement('div');
+                     itemDiv.classList.add('custom-item');
+                     if (iconClass) itemDiv.classList.add(iconClass);
+                     itemDiv.dataset.id = symbolId; // Store symbol ID on the item div
+                     itemDiv.innerHTML = `<span>${labelText}</span><textarea placeholder="Twoje myśli i refleksje dotyczące '${labelText}'..." data-id="${symbolId}">${savedReflection}</textarea><button class="save-reflection" data-id="${symbolId}" title="Zapisz tę refleksję">Zapisz Notatkę</button>`;
+                     customRoomItemsContainer.appendChild(itemDiv);
+                });
+            }
+
+
+             // Save the symbols selected IN THE CREATOR
+            function saveCreatorSelection() { localStorage.setItem(CREATOR_SELECTION_STORAGE_KEY, JSON.stringify(selectedSymbols)); }
+
+            // Load the symbols selected IN THE CREATOR
+            function loadCreatorSelection() {
+                 const saved = localStorage.getItem(CREATOR_SELECTION_STORAGE_KEY);
+                 try {
+                      selectedSymbols = saved ? JSON.parse(saved) : [];
+                      if (!Array.isArray(selectedSymbols)) selectedSymbols = []; // Ensure it's an array
+                 } catch (e) {
+                     console.error("Error loading creator selection:", e);
+                     selectedSymbols = []; // Reset on error
+                 }
+
+                 // Update the visual state of buttons in the creator gallery
+                 symbolGallery?.querySelectorAll('.interactive-item').forEach(btn => {
+                     btn.classList.toggle('selected', selectedSymbols.includes(btn.dataset.id));
+                 });
+                 updateSelectionInfo(); // Update info text and button state
+            }
+
+             // --- Saved Rooms Persistence ---
+
+            function loadSavedRooms() {
+                 const saved = localStorage.getItem(SAVED_ROOMS_STORAGE_KEY);
+                 try {
+                     savedRooms = saved ? JSON.parse(saved) : [];
+                     // Basic validation
+                     if (!Array.isArray(savedRooms)) savedRooms = [];
+                     savedRooms = savedRooms.filter(room => room && typeof room.name === 'string' && Array.isArray(room.symbols));
+                 } catch (e) {
+                     console.error("Error loading saved rooms from localStorage:", e);
+                     savedRooms = []; // Reset on error
+                 }
+                 console.log("Loaded saved rooms:", savedRooms);
+            }
+
+            function saveSavedRooms() {
+                 try {
+                      localStorage.setItem(SAVED_ROOMS_STORAGE_KEY, JSON.stringify(savedRooms));
+                      console.log("Saved rooms to localStorage.");
+                 } catch (e) {
+                     console.error("Error saving rooms to localStorage:", e);
+                 }
+            }
+
+             // Modified to use groups and headings
+            function renderHubNavigation() {
+                 if (!hubNavigation) return;
+
+                 // Clear current navigation
+                 hubNavigation.innerHTML = '';
+
+                 roomGroups.forEach((group, groupIndex) => {
+                     const groupDiv = document.createElement('div');
+                     groupDiv.classList.add('nav-group');
+
+                     if (group.heading) {
+                         const heading = document.createElement('h3');
+                         heading.textContent = group.heading;
+                         groupDiv.appendChild(heading);
+                     }
+
+                     // Add standard room buttons for this group
+                     group.rooms.forEach(room => {
+                         const button = document.createElement('button');
+                         button.classList.add('nav-button');
+                         button.dataset.target = room.id;
+                          // Add data-message and data-reflection if available (for interactive items in HUB itself if needed, though not currently used for non-room buttons)
+                          if (room.message) button.dataset.message = room.message;
+                          if (room.reflection) button.dataset.reflection = room.reflection;
+                           if (room.reflectionPrompts) button.dataset.reflectionPrompts = room.reflectionPrompts; // Add prompts data
+
+
+                         const iconSpan = document.createElement('span');
+                         iconSpan.classList.add(room.iconClass);
+                         button.appendChild(iconSpan);
+                         button.appendChild(document.createTextNode(room.label));
+                         groupDiv.appendChild(button);
+                     });
+
+                     // Special handling for the "Twoja przestrzeń" group to include saved rooms
+                     if (group.heading === 'Twoja przestrzeń' && savedRooms.length > 0) {
+                          // Optionally add a sub-heading for saved rooms
+                          const savedHeading = document.createElement('h4');
+                          savedHeading.textContent = 'Zapisane pokoje:';
+                          savedHeading.style.cssText = "width: 100%; text-align: center; margin-top: 15px; margin-bottom: 10px; color: var(--color-text-light); font-size: 1rem; font-weight: 600;";
+                          groupDiv.appendChild(savedHeading);
+
+                         savedRooms.forEach(room => {
+                             const button = document.createElement('button');
+                             button.classList.add('nav-button');
+                             button.classList.add('saved-room-button');
+                             button.dataset.target = 'room-custom-view';
+                             button.dataset.savedRoomName = room.name;
+                             const iconSpan = document.createElement('span');
+                             iconSpan.classList.add('saved-room-icon');
+                             button.appendChild(iconSpan);
+                             button.appendChild(document.createTextNode(room.name));
+                             groupDiv.appendChild(button);
+                         });
+                     }
+
+
+                     hubNavigation.appendChild(groupDiv);
+                 });
+
+                 // Ensure last group has no border
+                 const lastGroup = hubNavigation.lastElementChild;
+                  if (lastGroup && lastGroup.classList.contains('nav-group')) {
+                       lastGroup.style.borderBottom = 'none';
+                       lastGroup.style.marginBottom = '0';
+                       lastGroup.style.paddingBottom = '0';
+                  }
+            }
+
+
+             function deleteSavedRoom(roomName) {
+                 // Find the room by name
+                 const roomIndex = savedRooms.findIndex(room => room.name === roomName);
+
+                 if (roomIndex > -1) {
+                     const roomToDelete = savedRooms[roomIndex];
+
+                     // Ask for confirmation
+                     if (!confirm(`Czy na pewno chcesz usunąć pokój "${roomName}"? Spowoduje to usunięcie go z Menu głównego, ale notatki w symbolach pozostaną zapisane, chyba że usuniesz je ręcznie z kreatora.`)) {
+                         // Note: Clarified that notes *may* remain for symbols unless manually removed.
+                         return false; // Stop if user cancels
+                     }
+
+                     // We no longer automatically delete reflection notes associated with this room's symbols
+                     // roomToDelete.symbols.forEach(symbolId => {
+                     //     localStorage.removeItem(`${CUSTOM_REFLECTION_STORAGE_PREFIX}${symbolId}`);
+                     // });
+                     // This simplifies deletion and prevents accidental data loss if the user
+                     // used the same symbols in multiple custom rooms. Notes are tied to symbols, not rooms.
+
+                     // Remove the room from the array
+                     savedRooms.splice(roomIndex, 1);
+
+                     // Save the updated list
+                     saveSavedRooms();
+
+                     // Update the hub navigation
+                     renderHubNavigation();
+
+                     // Show success message
+                     showMessage("Usunięto!", `Pokój "${roomName}" został usunięty z Menu głównego.`); // Updated message
+
+                     // Navigate back to hub
+                     switchSection('hub');
+
+                     return true; // Indicate successful deletion
+                 } else {
+                     console.warn(`Attempted to delete non-existent room: "${roomName}"`);
+                     showMessage("Błąd", `Nie znaleziono pokoju "${roomName}" do usunięcia.`);
+                     loadSavedRooms(); // Try to resync
+                     renderHubNavigation(); // Update hub nav
+                     switchSection('hub'); // Go back to Menu główne
+                     return false; // Indicate failure
+                 }
+            }
+
+
+            // --- Funkcje Quizu ---
+            function startQuiz() {
+                 currentQuestionIndex = 0;
+                 score = 0; // Score is not used for feedback but reset anyway
+                 userAnswers = []; // Reset answers for new quiz
+                 resultArea.style.display = 'none';
+                 questionArea.style.display = 'flex'; // Display question area
+                 nextQuestionBtn.style.display = 'block'; // Display next button
+                 retakeQuizBtn.style.display = 'none'; // Hide retake button
+
+                 // Initially disable next button
+                 nextQuestionBtn.disabled = true;
+
+                 loadQuestion();
+            }
+
+            function loadQuestion() {
+                // Ensure button state is correctly set *before* loading question HTML
+                const selectedOption = quizOptions.querySelector(`input[name="question${currentQuestionIndex}"]:checked`);
+                nextQuestionBtn.disabled = !selectedOption;
+
+                 if (currentQuestionIndex < quizQuestions.length) {
+                     const questionData = quizQuestions[currentQuestionIndex];
+                     quizQuestionText.textContent = `Pytanie ${currentQuestionIndex + 1}/${quizQuestions.length}: ${questionData.question}`;
+                     quizOptions.innerHTML = ''; // Clear previous options
+
+                     questionData.options.forEach((option, index) => {
+                         const optionId = `q${currentQuestionIndex}-option${index}`;
+                         const label = document.createElement('label');
+                         label.setAttribute('for', optionId);
+                         // Added input first so label text doesn't shift
+                         label.innerHTML = `<input type="radio" name="question${currentQuestionIndex}" id="${optionId}" value="${index}"> ${option}`;
+                         quizOptions.appendChild(label);
+                     });
+
+                     // If there's a stored answer for this question in userAnswers (if resuming quiz - not implemented, but structure supports)
+                     if (userAnswers[currentQuestionIndex] !== undefined && userAnswers[currentQuestionIndex] !== -1) { // Also check it's not the -1 "no answer" state
+                          const savedAnswerIndex = userAnswers[currentQuestionIndex];
+                          const savedOptionInput = quizOptions.querySelector(`input[value="${savedAnswerIndex}"]`);
+                          if (savedOptionInput) {
+                             savedOptionInput.checked = true;
+                             nextQuestionBtn.disabled = false; // Enable button if a saved answer exists
+                          }
+                     } else {
+                         // If no saved answer, ensure button is disabled
+                         nextQuestionBtn.disabled = true;
+                     }
+
+
+                     // Update button text on the last question
+                     if (currentQuestionIndex === quizQuestions.length - 1) {
+                         nextQuestionBtn.textContent = 'Zakończ quiz';
+                     } else {
+                         nextQuestionBtn.textContent = 'Następne pytanie';
+                     }
+
+                 } else {
+                     showResults();
+                 }
+            }
+
+             function showResults() {
+                 questionArea.style.display = 'none'; // Hide question area
+                 nextQuestionBtn.style.display = 'none'; // Hide next button
+                 resultArea.style.display = 'flex'; // Show result area
+                 retakeQuizBtn.style.display = 'block'; // Show retake button
+
+                 quizScoreElement.textContent = "Podsumowanie Refleksji"; // Header
+
+                 // Generate personalized feedback based on answers
+                 // Removed the introductory sentence here, as the first feedback p will cover it
+                 let feedbackHTML = '';
+
+                 userAnswers.forEach((answerIndex, index) => {
+                     const questionData = quizQuestions[index];
+                     // Ensure answerIndex is valid, feedback snippet exists, and an answer was actually chosen (-1 means no answer)
+                     if (answerIndex !== -1 && questionData && questionData.feedbackSnippets && questionData.feedbackSnippets[answerIndex]) {
+                         feedbackHTML += `<p>${questionData.feedbackSnippets[answerIndex]}</p>`;
+                     } else {
+                          // Fallback feedback if no answer selected for this question
+                          feedbackHTML += `<p>Pytanie ${index + 1}: Nie wybrano odpowiedzi. Twoja perspektywa na ten temat również jest ważna.</p>`; // More specific fallback
+                     }
+                 });
+
+                 feedbackHTML += "<p>Pamiętaj, że każdy doświadcza tej zmiany inaczej. Wracaj do Pokoi, gdy poczujesz potrzebę głębszego przyjrzenia się swoim myśleniom.</p>"; // Fixed typo
+
+
+                 quizFeedbackElement.innerHTML = feedbackHTML; // Use innerHTML to render paragraphs
+                 // Make feedback scrollable if it overflows (Adjust maxHeight as needed)
+                  quizFeedbackElement.style.maxHeight = '300px';
+                  quizFeedbackElement.style.overflowY = 'auto';
+                  // Ensure text alignment remains left (already set in CSS but good to be sure)
+                  quizFeedbackElement.style.textAlign = 'left';
+            }
+
+            // --- Data Export/Import Functions ---
+            function exportData() {
+                console.log("Preparing data for export...");
+                const data = {};
+
+                // 1. Get standard localStorage keys
+                localStorageKeys.forEach(key => {
+                    const value = localStorage.getItem(key);
+                    if (value !== null) {
+                        try {
+                             // Try parsing JSON keys, store as parsed if successful
+                            data[key] = JSON.parse(value);
+                        } catch (e) {
+                             // If parsing fails, store as raw string
+                            data[key] = value;
+                        }
+                    }
+                });
+
+                // 2. Get all reflection notes dynamically
+                const reflectionNotes = {};
+                // Iterate through all keys in localStorage
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.startsWith(CUSTOM_REFLECTION_STORAGE_PREFIX)) {
+                         // Store the note text directly
+                        reflectionNotes[key] = localStorage.getItem(key);
+                    }
+                }
+                data.reflectionNotes = reflectionNotes; // Add reflection notes as a nested object
+
+                console.log("Export data object:", data);
+
+                const jsonData = JSON.stringify(data, null, 2); // Stringify with pretty printing
+                const blob = new Blob([jsonData], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'pokoje-pustego-gniazda-data.json'; // Suggested filename
+                document.body.appendChild(a); // Required for Firefox
+                a.click(); // Trigger the download
+                document.body.removeChild(a); // Clean up
+
+                URL.revokeObjectURL(url); // Release the object URL
+
+                showMessage("Eksport zakończony!", "Twoje dane zostały pobrane w pliku JSON.");
+            }
+
+            function importData(file) {
+                if (!file) {
+                    showMessage("Import anulowany.", "Nie wybrano pliku.");
+                    return;
+                }
+
+                if (file.type !== 'application/json') {
+                     showMessage("Błąd importu", "Wybrany plik nie jest plikiem JSON.");
+                     return;
+                }
+
+                const reader = new FileReader();
+
+                reader.onload = (event) => {
+                    try {
+                        const importedData = JSON.parse(event.target.result);
+                        console.log("Imported data:", importedData);
+
+                        // Basic Validation: Check if it contains expected keys and types
+                        if (typeof importedData !== 'object' || importedData === null) {
+                             throw new Error("Nieprawidłowy format danych (nie jest obiektem JSON).");
+                        }
+                        // More specific type checks for crucial keys
+                         if (importedData[SAVED_ROOMS_STORAGE_KEY] !== undefined && !Array.isArray(importedData[SAVED_ROOMS_STORAGE_KEY])) {
+                              throw new Error(`Nieprawidłowy format danych dla klucza "${SAVED_ROOMS_STORAGE_KEY}".`);
+                         }
+                         if (importedData[CREATOR_SELECTION_STORAGE_KEY] !== undefined && !Array.isArray(importedData[CREATOR_SELECTION_STORAGE_KEY])) {
+                             throw new Error(`Nieprawidłowy format danych dla klucza "${CREATOR_SELECTION_STORAGE_KEY}".`);
+                         }
+                          if (importedData.reflectionNotes !== undefined && typeof importedData.reflectionNotes !== 'object' || importedData.reflectionNotes === null) {
+                              throw new Error(`Nieprawidłowy format danych dla klucza "reflectionNotes".`);
+                          }
+
+
+                        // --- Apply Imported Data ---
+                        // Ask for confirmation before overwriting existing data
+                        if (!confirm("Import zastąpi wszystkie Twoje obecne zapisane pokoje, notatki i stan odwiedzenia pokoi. Czy na pewno chcesz kontynuować import?")) {
+                            showMessage("Import anulowany.", "Anulowano nadpisanie danych.");
+                            return; // Stop if user cancels
+                        }
+
+                        // Clear existing app-specific localStorage data
+                         console.log("Clearing existing app data in localStorage...");
+                         // Clear explicitly listed standard keys
+                         localStorageKeys.forEach(key => localStorage.removeItem(key));
+                          // Clear all reflection notes dynamically
+                          for (let i = localStorage.length - 1; i >= 0; i--) {
+                               const key = localStorage.key(i);
+                               if (key && key.startsWith(CUSTOM_REFLECTION_STORAGE_PREFIX)) {
+                                   localStorage.removeItem(key);
+                               }
+                           }
+                         console.log("Existing app data cleared.");
+
+
+                        // Set data from imported object
+                        for (const key in importedData) {
+                             if (importedData.hasOwnProperty(key)) {
+                                 if (key === 'reflectionNotes') {
+                                     // Handle reflection notes separately
+                                     if (typeof importedData[key] === 'object' && importedData[key] !== null) {
+                                         for (const noteKey in importedData[key]) {
+                                              // Only import keys starting with the reflection prefix
+                                             if (importedData[key].hasOwnProperty(noteKey) && noteKey.startsWith(CUSTOM_REFLECTION_STORAGE_PREFIX)) {
+                                                 localStorage.setItem(noteKey, importedData[key][noteKey]);
+                                             } else {
+                                                  console.warn(`Skipping invalid reflection note key in import data: ${noteKey}`);
+                                             }
+                                         }
+                                     }
+                                 } else if (localStorageKeys.includes(key)) {
+                                      // Handle explicitly listed standard keys
+                                      // For keys that were stored as parsed JSON, stringify them back
+                                      const valueToStore = (key === SAVED_ROOMS_STORAGE_KEY || key === CREATOR_SELECTION_STORAGE_KEY)
+                                           ? JSON.stringify(importedData[key])
+                                           : importedData[key];
+                                       localStorage.setItem(key, valueToStore);
+                                 } else {
+                                     console.warn(`Skipping unexpected key in import data: ${key}`);
+                                 }
+                             }
+                        }
+
+
+                        // Reload necessary data and update UI
+                        loadCreatorSelection(); // Re-load creator state
+                        loadSavedRooms(); // Re-load saved rooms
+                        renderHubNavigation(); // Update hub navigation
+
+                         // Decide where to navigate after import. Best to go back to the main menu.
+                         switchSection('hub');
+
+
+                        showMessage("Import zakończony!", "Dane zostały pomyślnie zaimportowane. Twoje zapisane pokoje i notatki powinny być teraz dostępne w Menu głównym.");
+                        // Optional: Force a page reload to fully apply all potential state changes cleanly
+                         // setTimeout(() => { location.reload(); }, 1500); // Give user time to read the message
+
+                    } catch (e) {
+                        console.error("Error parsing or importing data:", e);
+                        showMessage("Błąd importu", `Nie udało się przetworzyć pliku. Upewnij się, że plik jest poprawnym plikiem danych z tej aplikacji. Szczegóły: ${e.message}`);
+                    }
+                };
+
+                reader.onerror = (event) => {
+                    console.error("Error reading file:", event.target.error);
+                    showMessage("Błąd odczytu pliku", "Nie udało się odczytać wybranego pliku.");
+                };
+
+                reader.readAsText(file); // Read the file as text
+            }
+
+
+            // --- Global Event Listener (Delegation) ---
+            mainContent.addEventListener('click', (event) => {
+                 const navButton = event.target.closest('.nav-button');
+                 const interactiveItem = event.target.closest('.interactive-item');
+                 const backButton = event.target.closest('.back-to-hub');
+                 // Save/Delete buttons handled by specific listeners below
+                 // Import button trigger moved to dedicated listener
+
+
+                 // Handle Interactive Items (Objects) in standard rooms
+                 // This listener now specifically checks if the clicked item is *not* inside symbol-gallery or custom-room-items
+                 if (interactiveItem && interactiveItem.dataset.message) {
+                      const parentObjectsContainer = interactiveItem.closest('.objects-container');
+                       // Check if the parent container is NOT the symbol gallery or custom items
+                       if (parentObjectsContainer && parentObjectsContainer.id !== 'symbol-gallery' && parentObjectsContainer.id !== 'custom-room-items') {
+                           // Use showMessage with the reflection prompts data
+                           const reflectionPrompts = interactiveItem.dataset.reflectionPrompts;
+                           showMessage(interactiveItem.dataset.message, interactiveItem.dataset.reflection, reflectionPrompts);
+                       }
+                       // Note: interactive items in symbol-gallery handle 'selected' state via click on the button itself,
+                       // and custom-items handle save via click on their button.
+                 }
+                // Handle Navigation Buttons
+                 else if (navButton) {
+                     const targetId = navButton.dataset.target;
+
+                     // Handle Saved Room Button
+                     if (navButton.classList.contains('saved-room-button') && navButton.dataset.savedRoomName) {
+                          const roomName = navButton.dataset.savedRoomName;
+                          const roomToLoad = savedRooms.find(room => room.name === roomName);
+                          if (roomToLoad) {
+                              console.log("Loading saved room:", roomName);
+                              // Pass the room data object to switchSection for the view
+                              switchSection('room-custom-view', roomToLoad);
+                          } else {
+                               console.warn(`Saved room "${roomName}" not found!`);
+                               showMessage("Błąd", `Nie udało się wczytać pokoju "${roomName}". Możliwe, że został usunięty lub usunięto dane przeglądarki.`);
+                               loadSavedRooms(); // Try to refresh the list
+                               renderHubNavigation(); // Update hub nav
+                               switchSection('hub'); // Go back to Menu główne
+                          }
+                     } else if (targetId) {
+                          // Handle Standard or Creator/Quiz/Definition/About/Exercise/Links buttons
+                          switchSection(targetId);
+                          // Mark main rooms as visited (Past, Present, Future, Rebuilt)
+                         const mainRoomsToCount = standardRooms.filter(r => ['room-past', 'room-present', 'room-future', 'room-rebuilt'].includes(r.id)).map(r => r.id);
+                         if (mainRoomsToCount.includes(targetId)) {
+                             localStorage.setItem(targetId + '-visited', 'true');
+                         }
+
+                     }
+                 } else if (backButton) {
+                     // Handle generic back button
+                     switchSection('hub');
+                 }
+                 // Other specific button clicks like Save/Delete room, Next/Retake quiz,
+                 // Save reflection notes, Symbol gallery selection, and Import trigger
+                 // are handled by their dedicated listeners attached directly or via delegation on their containers.
+            });
+
+            // --- Listener for clicking on the Reflection text in the dialog ---
+             dialogReflection.addEventListener('click', () => {
+                 const promptsString = infoDialog.dataset.currentPrompts;
+                 if (promptsString) {
+                      const prompts = promptsString.split(';;').filter(p => p.trim() !== ''); // Split by delimiter and filter empty
+                      if (prompts.length > 0) {
+                           let promptsHTML = '';
+                           prompts.forEach(prompt => {
+                               promptsHTML += `<p>${prompt.trim()}</p>`;
+                           });
+                           dialogPrompts.innerHTML = promptsHTML;
+
+                           // Toggle display
+                           if (dialogPrompts.style.display === 'none') {
+                               dialogPrompts.style.display = 'block';
+                           } else {
+                               dialogPrompts.style.display = 'none';
+                           }
+
+                      } else {
+                           console.warn("No prompts found for this reflection.");
+                           // Optionally show a message indicating no prompts are available
+                           // dialogPrompts.innerHTML = "<p>Brak dodatkowych podpowiedzi dla tej refleksji.</p>";
+                           // dialogPrompts.style.display = 'block';
+                      }
+                 }
+             });
+
+            // --- Listener for the "Importuj dane" button to trigger file input click ---
+            importDataBtn.addEventListener('click', () => {
+                 importFileInput.click();
+            });
+
+
+            // --- Listeners Kreatora ---
+             symbolGallery.addEventListener('click', (event) => {
+                 const target = event.target.closest('.interactive-item[data-id]');
+                 if (!target) return;
+                 const symbolId = target.dataset.id;
+                 const index = selectedSymbols.indexOf(symbolId);
+                 if (index > -1) { selectedSymbols.splice(index, 1); target.classList.remove('selected'); }
+                 else if (selectedSymbols.length < MAX_SYMBOLS) { selectedSymbols.push(symbolId); target.classList.add('selected'); }
+                 updateSelectionInfo();
+                 saveCreatorSelection(); // Save the current selection state in the creator
+             });
+
+             createCustomRoomBtn.addEventListener('click', () => {
+                 if (!createCustomRoomBtn.disabled) {
+                     // selectedSymbols is already updated and saved by symbolGallery listener
+                     // When creating from creator, we don't pass savedRoomData, so switchSection uses selectedSymbols
+                     switchSection('room-custom-view');
+                 }
+             });
+
+            // --- Listeners Custom View ---
+             // Listener for saving reflection notes *within* custom room items
+             customRoomItemsContainer.addEventListener('click', (event) => {
+                 const saveButton = event.target.closest('.save-reflection[data-id]');
+                 if (!saveButton) return;
+                 const symbolId = saveButton.dataset.id;
+                 // Find the textarea associated with this button, which is inside the same .custom-item parent
+                 const textarea = saveButton.closest('.custom-item')?.querySelector(`textarea[data-id="${symbolId}"]`);
+                 if (textarea) {
+                      localStorage.setItem(`${CUSTOM_REFLECTION_STORAGE_PREFIX}${symbolId}`, textarea.value);
+                      saveButton.textContent = 'Zapisano!'; saveButton.classList.add('saved');
+                      setTimeout(() => { saveButton.textContent = 'Zapisz Notatkę'; saveButton.classList.remove('saved'); }, 1500);
+                  }
+             });
+
+            // Listener for the "Save/Update Room" button in the custom view
+             saveCustomRoomBtn.addEventListener('click', () => {
+                 // Get the symbols currently displayed in the custom view
+                 const symbolsInView = Array.from(customRoomItemsContainer.querySelectorAll('.custom-item')).map(item => item.dataset.id).filter(id => id);
+
+                 if (symbolsInView.length === 0) {
+                      showMessage("Brak symboli", "Twój pokój jest pusty. Dodaj symbole w kreatorze, zanim go zapiszesz.");
+                      return;
+                 }
+
+                 let roomName = roomCustomViewSection.dataset.loadedRoomName; // Get name if currently loaded a saved room
+
+                 if (!roomName) { // If it's not a loaded saved room, ask for a name
+                     roomName = prompt("Podaj nazwę dla Twojego pokoju:");
+                     if (roomName === null) { // User clicked Cancel
+                         return;
+                     }
+                     roomName = roomName.trim();
+                     if (roomName === "") {
+                          showMessage("Nazwa wymagana", "Proszę podać nazwę dla swojego pokoju.");
+                          return;
+                     }
+                 }
+
+
+                 // Check if a room with this name already exists (excluding the current one if updating)
+                 const existingRoomIndex = savedRooms.findIndex(room => room.name === roomName);
+
+                 if (existingRoomIndex > -1) {
+                      // Room exists. If the loaded room name is empty or different, it's a new save trying to overwrite.
+                      // If the loaded room name is the same, it's an update to the existing room.
+                      if (roomCustomViewSection.dataset.loadedRoomName === roomName) {
+                         // It's an update, just replace the old entry
+                         savedRooms.splice(existingRoomIndex, 1);
+                         console.log(`Updating room "${roomName}".`);
+                      } else {
+                         // It's a new save trying to overwrite an existing one
+                         const overwrite = confirm(`Pokój o nazwie "${roomName}" już istnieje. Czy chcesz go zastąpić? Notatki dla symboli pozostaną, ale lista symboli w pokoju zostanie zaktualizowana.`);
+                         if (!overwrite) {
+                             return; // User chose not to overwrite
+                         }
+                         // Before removing the old room entry, we don't delete notes automatically.
+                         savedRooms.splice(existingRoomIndex, 1); // Remove the old room entry
+                         console.log(`Overwriting room "${roomName}".`);
+                      }
+                 }
+
+                 // Add the new (or updated) room entry
+                 savedRooms.push({ name: roomName, symbols: symbolsInView });
+                 saveSavedRooms(); // Save updated array to localStorage
+                 renderHubNavigation(); // Update the hub with the new room button
+
+                 // Update the view to reflect it's now a saved room
+                 roomCustomViewSection.dataset.loadedRoomName = roomName; // Mark as loaded saved room
+                 customRoomViewTitle.textContent = roomName; // Update title
+                 deleteCustomRoomBtn.style.display = 'inline-block'; // Show delete button
+                 saveCustomRoomBtn.textContent = 'Zaktualizuj ten pokój'; // Update button text
+
+
+                 showMessage("Zapisano!", `Pokój "${roomName}" został zapisany/zaktualizowany. Znajdziesz go teraz w Menu głównym.`); // Updated message
+             });
+
+             // Listener for the "Delete Room" button in the custom view
+            deleteCustomRoomBtn.addEventListener('click', () => {
+                 const roomNameToDelete = roomCustomViewSection.dataset.loadedRoomName;
+
+                 if (roomNameToDelete) {
+                      // deleteSavedRoom function already handles confirmation, deletion, saving, rendering, and switching section
+                      deleteSavedRoom(roomNameToDelete);
+                 } else {
+                      // This button should ideally not be visible if no saved room is loaded,
+                      // but as a fallback:
+                     showMessage("Błąd", "Nie można usunąć pokoju, ponieważ nie załadowano żadnego zapisanego pokoju.");
+                     deleteCustomRoomBtn.style.display = 'none'; // Hide the button
+                 }
+            });
+
+
+             // --- Listeners Quiz ---
+             // Listener for the "Następne pytanie" / "Zakończ quiz" button
+             nextQuestionBtn.addEventListener('click', () => {
+                 const selectedOption = quizOptions.querySelector(`input[name="question${currentQuestionIndex}"]:checked`);
+                 let answerIndex = -1; // Default for no answer selected
+
+                 if (selectedOption) {
+                     answerIndex = parseInt(selectedOption.value, 10);
+                      // Score update (optional for reflective quiz)
+                      // if (answerIndex === quizQuestions[currentQuestionIndex].answer) {
+                      //     score++;
+                      // }
+                 } else {
+                     console.warn(`No answer selected for question ${currentQuestionIndex}. Storing -1.`);
+                 }
+
+                 userAnswers[currentQuestionIndex] = answerIndex; // Store the selected answer index (-1 if none)
+
+                 currentQuestionIndex++;
+                 loadQuestion(); // Load next question or show results
+
+             });
+
+             // Listener for the "Spróbuj ponownie" button
+             retakeQuizBtn.addEventListener('click', () => {
+                 startQuiz();
+             });
+
+             // Listen for changes on radio buttons to enable the 'Next' button
+             quizOptions.addEventListener('change', (event) => {
+                 // Check if the change happened on a radio button within the current question's options
+                 if (event.target.type === 'radio' && event.target.name === `question${currentQuestionIndex}`) {
+                      nextQuestionBtn.disabled = false;
+                 }
+             });
+
+            // --- Listener Zamknięcia Modala ---
+            // Use the renamed dialog variable
+            infoDialog.addEventListener('close', hideMessage);
+
+            // --- Data Export/Import Listeners ---
+             exportDataBtn.addEventListener('click', exportData);
+
+             // No click listener needed for importDataBtn here anymore, handled by delegation
+
+             importFileInput.addEventListener('change', (event) => {
+                 const file = event.target.files[0];
+                 if (file) {
+                     importData(file);
+                 }
+                 // Clear the input value so the same file can be selected again if needed
+                 event.target.value = '';
+             });
+
+
+            // --- Stan Początkowy ---
+             loadCreatorSelection(); // Load the last selected symbols for the creator
+             loadSavedRooms(); // Load saved custom rooms
+             renderHubNavigation(); // Render the hub navigation including saved rooms
+
+             const lastRoom = localStorage.getItem('lastVisitedRoom');
+             const hubElement = document.getElementById('hub');
+
+             // Ensure hub is active initially before potential switch
+             if (hubElement) {
+                 // Don't add is-active here directly, let switchSection handle the initial active state.
+                 // We'll call switchSection below.
+             } else {
+                  console.error("Hub element not found!");
+                  return; // Cannot proceed without hub
+             }
+
+             // Attempt to restore last room *after* hub nav is rendered
+             // Default to hub if lastRoom is null, or default to creator if lastRoom was the custom view.
+             if (lastRoom && document.getElementById(lastRoom) && lastRoom !== 'hub') {
+                 console.log("Restoring last:", lastRoom);
+                 // If the last room was the custom view, load the creator selection screen instead.
+                 // This avoids issues with trying to load a specific *saved* room without its name.
+                 if (lastRoom === 'room-custom-view') {
+                      console.log("Last room was custom view, navigating to creator.");
+                      switchSection('room-custom-creator');
+                 } else {
+                     // Navigate to any other standard room, quiz, definition, about, exercise, or creator
+                     switchSection(lastRoom);
+                 }
+              } else {
+                   console.log("Starting with hub.");
+                   // Manually set hub active if no valid last room was restored or last room was hub
+                   if (hubElement) hubElement.classList.add('is-active');
+                   updateHubVisuals(); // Initial update for hub state
+               }
+
+
+            console.log("v20.0 Initialized successfully!");
+        });
+    </script>
+</body>
+</html>
